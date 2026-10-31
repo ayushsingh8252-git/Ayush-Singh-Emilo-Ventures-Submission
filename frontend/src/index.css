@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; }
+  body { @apply bg-ivory text-ink-900 font-sans; }
+  ::selection { @apply bg-clay-100 text-ink-900; }
+}
+
+@layer components {
+  .field {
+    @apply w-full rounded-xl border border-sand-200 bg-white px-3 py-2 text-sm text-ink-900
+      placeholder:text-ink-400 outline-none transition focus:border-clay-500 focus:ring-4 focus:ring-clay-100;
+  }
+}

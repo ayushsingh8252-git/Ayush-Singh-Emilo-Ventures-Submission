@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Project-specific ---
+# Frontend
+node_modules/
+frontend/dist/
+# Cached product embeddings (regenerated automatically)
+backend/.cache/
+.pytest_cache/
+
+# Playwright artifacts
+frontend/test-results/
+frontend/playwright-report/
