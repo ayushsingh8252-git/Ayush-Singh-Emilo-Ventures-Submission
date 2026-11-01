@@ -28,4 +28,15 @@ for (const [file, path, viewport, fullPage] of shots) {
   console.log('wrote', file)
   await page.close()
 }
+// Product detail panel
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 })
+  await page.goto(BASE + encodeURI("/?q=Valentine's Day"))
+  await page.getByTestId('product-card').first().getByRole('button', { name: 'View details', exact: true }).click()
+  await page.getByRole('dialog').waitFor()
+  await page.waitForTimeout(600)
+  await page.screenshot({ path: fileURLToPath(new URL('08-product-detail.png', OUT)) })
+  console.log('wrote 08-product-detail.png')
+  await page.close()
+}
 await browser.close()

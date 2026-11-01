@@ -8,7 +8,7 @@ The engine is a **hybrid recommender**: MiniLM sentence embeddings searched with
 |---|---|
 | ![Occasion input](screenshots/01-occasion-input.png) | ![Results](screenshots/02-results-valentines.png) |
 
-More screenshots: [Diwali](screenshots/03-results-diwali.png) · [free text + budget](screenshots/04-free-text-budget.png) · [empty state](screenshots/05-empty-state.png) · [mobile (390 px)](screenshots/06-mobile.png) · [Graduation](screenshots/07-results-graduation.png). They are regenerated from the running app with `node e2e/capture-screenshots.mjs` (in `frontend/`).
+More screenshots: [Diwali](screenshots/03-results-diwali.png) · [free text + budget](screenshots/04-free-text-budget.png) · [empty state](screenshots/05-empty-state.png) · [mobile (390 px)](screenshots/06-mobile.png) · [Graduation](screenshots/07-results-graduation.png) · [product detail](screenshots/08-product-detail.png). They are regenerated from the running app with `node e2e/capture-screenshots.mjs` (in `frontend/`).
 
 > **Note on product images.** Every card uses the product's real `mainImage` URL, unchanged. At the time of writing (31 Oct 2026), the images cannot be loaded from the source. I checked all 110 URLs individually with full `GET` requests:
 >
@@ -54,10 +54,11 @@ Given a product catalog (supplied as `products.json` with the assignment), recom
 - **Grounded explanations:** each reason names the matched occasion themes, quotes words that actually appear in the listing, and cites the description sentence most similar to the query.
 - **Diversity-aware ranking:** MMR re-ranking with category and product-group penalties.
 - **Honest empty states:** a relevance gate keeps unrelated products out of the results, so *"gaming laptop"* returns no matches.
-- **Filters:** minimum price, maximum price and category, all applied server-side.
+- **Filters and sorting:** minimum price, maximum price and category (applied server-side, shown as removable chips); sort by best match, price or discount.
+- **Product detail panel:** full description, explanation, matched themes and the per-signal score breakdown (semantic, keyword, occasion fit).
 - **Graceful degradation:** TF-IDF fallback if the model can't load, and a NumPy index if FAISS can't load. Both are reported by `/api/health`.
 - **Shareable searches:** the query is synced to `?q=` in the URL.
-- **Tests:** 92 backend tests (pytest) and 16 browser end-to-end tests (Playwright in Chrome), plus an offline ranking evaluation (`scripts/ablation.py`).
+- **Tests:** 92 backend tests (pytest) and 20 browser end-to-end tests (Playwright in Chrome), plus an offline ranking evaluation (`scripts/ablation.py`).
 
 ## Architecture
 
@@ -394,7 +395,7 @@ cd frontend
 npm run test:e2e
 ```
 
-Result: **16 passed** in Chrome. Covered:
+Result: **20 passed** in Chrome. Covered:
 
 - the labelled input, search button, Enter key and suggestion chips
 - results rendering below the input, with rank, category, price, stock, match score and reason
@@ -407,6 +408,7 @@ Result: **16 passed** in Chrome. Covered:
 - the image fallback, and an image rendering when the host responds
 - `?q=` deep links
 - a 375 px mobile layout with no horizontal overflow
+- the live engine-status badge, sorting (ranks preserved), the product detail panel (score breakdown, Esc to close) and removable filter chips
 
 Only the loading, error and image-success tests intercept network calls; everything else runs against the real API and catalog.
 

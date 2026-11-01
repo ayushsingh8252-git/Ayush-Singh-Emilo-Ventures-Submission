@@ -20,8 +20,9 @@ export default {
       },
       keyframes: {
         rise: { '0%': { opacity: 0, transform: 'translateY(8px)' }, '100%': { opacity: 1, transform: 'none' } },
+        fade: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
       },
-      animation: { rise: 'rise 0.45s ease-out both' },
+      animation: { rise: 'rise 0.45s ease-out both', fade: 'fade 0.2s ease-out both' },
     },
   },
   plugins: [],

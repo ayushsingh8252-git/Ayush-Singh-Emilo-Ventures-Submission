@@ -207,3 +207,52 @@ test.describe('mobile layout', () => {
     expect(box.x + box.width).toBeLessThanOrEqual(375)
   })
 })
+
+test('navigation bar shows the live engine status', async ({ page }) => {
+  await expect(page.getByTestId('engine-status')).toHaveText('AI ranking active')
+  await expect(page.getByRole('link', { name: 'API docs' })).toHaveAttribute('href', /\/docs$/)
+})
+
+test('sorting reorders results but keeps relevance ranks', async ({ page }) => {
+  await occasionInput(page).fill("Valentine's Day")
+  await findButton(page).click()
+  await expect(cards(page).first()).toBeVisible()
+  await page.getByLabel('Sort results').selectOption('price-asc')
+  const ascending = await prices(page)
+  expect(ascending).toEqual([...ascending].sort((a, b) => a - b))
+  await page.getByLabel('Sort results').selectOption('price-desc')
+  const descending = await prices(page)
+  expect(descending).toEqual([...descending].sort((a, b) => b - a))
+  await page.getByLabel('Sort results').selectOption('relevance')
+  await expect(cards(page).first().getByText('#1')).toBeVisible()
+})
+
+test('product detail panel shows full explanation and score breakdown', async ({ page }) => {
+  await occasionInput(page).fill('Anniversary')
+  await findButton(page).click()
+  const first = cards(page).first()
+  const name = await first.getByRole('heading', { level: 3 }).innerText()
+  await first.getByRole('button', { name: 'View details', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole('heading', { name })).toBeVisible()
+  await expect(dialog.getByText('Semantic similarity')).toBeVisible()
+  await expect(dialog.getByText('Keyword match')).toBeVisible()
+  await expect(dialog.getByText('Occasion fit')).toBeVisible()
+  await expect(dialog.getByText(/Recommended for Anniversary/)).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+})
+
+test('active filter chips can be removed', async ({ page }) => {
+  await occasionInput(page).fill('Birthday')
+  await findButton(page).click()
+  await expect(cards(page).first()).toBeVisible()
+  await page.getByRole('button', { name: /filters/i }).click()
+  await page.getByLabel('Max price (₹)').fill('800')
+  await expect(page.getByText('Max ₹800')).toBeVisible()
+  const cleared = page.waitForRequest((r) => r.url().endsWith('/api/recommend') && r.postDataJSON().max_price === null)
+  await page.getByRole('button', { name: 'Remove Max ₹800 filter' }).click()
+  await cleared
+  await expect(page.getByText('Max ₹800')).toHaveCount(0)
+})
