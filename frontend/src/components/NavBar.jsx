@@ -1,4 +1,4 @@
-import { BookOpen, Gift } from 'lucide-react'
+import { BookOpen, Gift, Sparkles } from 'lucide-react'
 import { API_URL } from '../api.js'
 
 const STATUS = {
@@ -8,7 +8,7 @@ const STATUS = {
   checking: { dot: 'bg-ink-400 animate-pulse', label: 'Connecting…', hint: 'Checking the recommendation API' },
 }
 
-export default function NavBar({ engineStatus }) {
+export default function NavBar({ engineStatus, llmStatus }) {
   const status = STATUS[engineStatus] || STATUS.checking
   return (
     <nav className="sticky top-0 z-30 border-b border-sand-100 bg-ivory/85 backdrop-blur-md">
@@ -28,6 +28,15 @@ export default function NavBar({ engineStatus }) {
             <span className={`h-2 w-2 rounded-full ${status.dot}`} />
             {status.label}
           </span>
+          {llmStatus === 'ready' && (
+            <span
+              className="hidden items-center gap-1.5 rounded-full border border-sand-200 bg-white px-3 py-1 text-xs font-medium text-ink-700 md:inline-flex"
+              title="Natural-language queries are interpreted by an LLM; recommendations still come only from the catalog"
+              data-testid="llm-status"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-clay-500" /> Gemini understanding
+            </span>
+          )}
           <a
             href={`${API_URL}/docs`}
             target="_blank"

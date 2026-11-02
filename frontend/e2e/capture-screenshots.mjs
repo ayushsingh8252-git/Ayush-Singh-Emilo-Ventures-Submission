@@ -39,4 +39,15 @@ for (const [file, path, viewport, fullPage] of shots) {
   console.log('wrote 08-product-detail.png')
   await page.close()
 }
+// Natural-language query. Shows the Gemini badge only if the backend runs with LLM_ENABLED=true.
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 }, deviceScaleFactor: 1 })
+  await page.goto(BASE + encodeURI("/?q=somthing for my mom's bday, nothing above 1500 rupees"))
+  await page.getByTestId('product-card').first().or(page.getByText('No matches yet')).waitFor({ timeout: 60000 })
+  await page.waitForTimeout(800)
+  const mode = await page.getByTestId('understanding').getByText('Understood by Gemini').count() ? 'llm' : 'rules'
+  await page.screenshot({ path: fileURLToPath(new URL('09-natural-language-llm.png', OUT)) })
+  console.log(`wrote 09-natural-language-llm.png (understanding: ${mode})`)
+  await page.close()
+}
 await browser.close()

@@ -1,0 +1,2393 @@
+{
+  "model": "gemini/gemini-3.1-flash-lite",
+  "cases": 26,
+  "summary": {
+    "rules": {
+      "null": {
+        "n": 26,
+        "ndcg": 0.7426780610777061,
+        "p10": 0.8451465201465201,
+        "occ": 84.61538461538461,
+        "rec": 76.92307692307692,
+        "budget": 96.15384615384616,
+        "lat_p50": 40.22745000111172,
+        "lat_p95": 59.63649999466725,
+        "lat_mean": 41.645246153795874
+      },
+      "occasion": {
+        "n": 11,
+        "ndcg": 0.8112374351690038,
+        "p10": 0.9348484848484848,
+        "occ": 100.0,
+        "rec": 90.9090909090909,
+        "budget": 100.0,
+        "lat_p50": 39.7374000021955,
+        "lat_p95": 46.4231000005384,
+        "lat_mean": 39.58057272790359
+      },
+      "natural language": {
+        "n": 15,
+        "ndcg": 0.6924011867440877,
+        "p10": 0.7793650793650794,
+        "occ": 73.33333333333333,
+        "rec": 66.66666666666667,
+        "budget": 93.33333333333333,
+        "lat_p50": 40.71750000002794,
+        "lat_p95": 60.674200001813006,
+        "lat_mean": 43.15933999945022
+      }
+    },
+    "llm": {
+      "null": {
+        "n": 26,
+        "ndcg": 0.7316284761879935,
+        "p10": 0.7896978021978022,
+        "occ": 96.15384615384616,
+        "rec": 73.07692307692308,
+        "budget": 100.0,
+        "lat_p50": 2290.776599998935,
+        "lat_p95": 5351.402500004042,
+        "lat_mean": 2728.1542423073774
+      },
+      "occasion": {
+        "n": 11,
+        "ndcg": 0.7477437430249395,
+        "p10": 0.8333333333333334,
+        "occ": 100.0,
+        "rec": 63.63636363636363,
+        "budget": 100.0,
+        "lat_p50": 2388.927899999544,
+        "lat_p95": 5324.578600004315,
+        "lat_mean": 2371.51143636319
+      },
+      "natural language": {
+        "n": 15,
+        "ndcg": 0.7198106138408998,
+        "p10": 0.7576984126984126,
+        "occ": 93.33333333333333,
+        "rec": 80.0,
+        "budget": 100.0,
+        "lat_p50": 2192.625299998326,
+        "lat_p95": 7023.375800003123,
+        "lat_mean": 2989.692299999782
+      }
+    },
+    "routed": {
+      "null": {
+        "n": 26,
+        "ndcg": 0.7917556870321252,
+        "p10": 0.8749542124542125,
+        "occ": 92.3076923076923,
+        "rec": 92.3076923076923,
+        "budget": 100.0,
+        "lat_p50": 1172.713650001242,
+        "lat_p95": 3347.2188000014285,
+        "lat_mean": 1112.5285115396343
+      },
+      "occasion": {
+        "n": 11,
+        "ndcg": 0.8112374351690038,
+        "p10": 0.9348484848484848,
+        "occ": 100.0,
+        "rec": 90.9090909090909,
+        "budget": 100.0,
+        "lat_p50": 46.9987000033143,
+        "lat_p95": 63.313700004073326,
+        "lat_mean": 48.26987272826955
+      },
+      "natural language": {
+        "n": 15,
+        "ndcg": 0.7774690717317475,
+        "p10": 0.831031746031746,
+        "occ": 86.66666666666667,
+        "rec": 93.33333333333333,
+        "budget": 100.0,
+        "lat_p50": 1379.7161999973468,
+        "lat_p95": 5332.70690000063,
+        "lat_mean": 1892.9848466679687
+      }
+    }
+  },
+  "mode_cost": {
+    "llm": {
+      "calls": 22,
+      "tokens_in": 10248,
+      "tokens_out": 1825,
+      "usd": 0.0052995,
+      "usd_per_1000_queries": 0.20382692307692307
+    },
+    "routed": {
+      "calls": 14,
+      "tokens_in": 6590,
+      "tokens_out": 1189,
+      "usd": 0.003431,
+      "usd_per_1000_queries": 0.13196153846153846
+    }
+  },
+  "cost": {
+    "calls": 36,
+    "tokens_in": 16838,
+    "tokens_out": 3014,
+    "usd": 0.0087305,
+    "usd_per_1000_queries": 0.2425138888888889,
+    "price_in": 0.25,
+    "price_out": 1.5,
+    "llm_call_latency_ms_mean": 1894.5795055553592
+  },
+  "llm_live_failures": 5,
+  "fallback": {
+    "timeout": {
+      "identical": 26,
+      "total": 26,
+      "errors": 0,
+      "reasons": [
+        "None",
+        "circuit_open",
+        "timeout"
+      ]
+    },
+    "http_error": {
+      "identical": 26,
+      "total": 26,
+      "errors": 0,
+      "reasons": [
+        "None",
+        "circuit_open",
+        "http_error"
+      ]
+    },
+    "network": {
+      "identical": 26,
+      "total": 26,
+      "errors": 0,
+      "reasons": [
+        "None",
+        "circuit_open",
+        "network"
+      ]
+    },
+    "invalid_response": {
+      "identical": 26,
+      "total": 26,
+      "errors": 0,
+      "reasons": [
+        "None",
+        "circuit_open",
+        "invalid_response"
+      ]
+    },
+    "malformed JSON fields": {
+      "identical": 26,
+      "total": 26,
+      "errors": 0,
+      "reasons": [
+        "None",
+        "circuit_open",
+        "invalid_response"
+      ]
+    },
+    "real 1 ms timeout": {
+      "identical": 26,
+      "total": 26,
+      "errors": 0,
+      "reasons": [
+        "None",
+        "circuit_open",
+        "timeout"
+      ]
+    },
+    "missing API key": {
+      "identical": 26,
+      "total": 26,
+      "errors": 0,
+      "reasons": [
+        "missing_key"
+      ]
+    }
+  },
+  "rows": {
+    "rules": [
+      {
+        "query": "Birthday",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Birthday",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.6627723625099973,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 42.9742000051192,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Flower",
+          "Snacks Box"
+        ]
+      },
+      {
+        "query": "Wedding",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Wedding",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.7136029928573593,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 45.88969999895198,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Engagement Gift"
+        ]
+      },
+      {
+        "query": "Valentine's Day",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Valentine's Day",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 41.25889999704668,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Couple Perfumes",
+          "Couple Mugs",
+          "Flower"
+        ]
+      },
+      {
+        "query": "Diwali",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Diwali",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.46900009332067477,
+        "p10": 0.75,
+        "results": 4,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 35.82749999623047,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Diwali Dry fruits hampers",
+          "Diwali Luxury Gift Hampers",
+          "Kashmiri Suits"
+        ]
+      },
+      {
+        "query": "Anniversary",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Anniversary",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8874582952544261,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 41.09489999973448,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Forever Rose"
+        ]
+      },
+      {
+        "query": "Office Party",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Office Party",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 39.7374000021955,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Executive pens",
+          "Office wears",
+          "Fountain Pens"
+        ]
+      },
+      {
+        "query": "Father's Day",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Father's Day",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8043890678175752,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 36.058600002434105,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Vintage Watch",
+          "Metallic Gold Watch",
+          "Metallic silver watch"
+        ]
+      },
+      {
+        "query": "Mother's Day",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Mother's Day",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 46.4231000005384,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Flower",
+          "Mental Wellness Gifts",
+          "Flower"
+        ]
+      },
+      {
+        "query": "Baby Shower",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Baby Shower",
+        "recipient": "baby",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8020713147301064,
+        "p10": 0.8333333333333334,
+        "results": 6,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 32.88159999647178,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Baby Shower & Newborn Gifts",
+          "Teddy bears",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "Graduation",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Graduation",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8358894066114714,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 38.785100005043205,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Executive pens",
+          "Physical Gift Cards",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "Housewarming",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Housewarming",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.7484282537574317,
+        "p10": 1.0,
+        "results": 7,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 34.45530000317376,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Housewarming Gifts",
+          "Indoor plants & planters",
+          "Recycled & Upcycled Gifts"
+        ]
+      },
+      {
+        "query": "Suggest a romantic gift for my girlfriend under ₹2,000.",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Romantic",
+        "recipient": "girlfriend",
+        "budget": [
+          null,
+          2000.0
+        ],
+        "preferences": [],
+        "ndcg": 0.901447006056365,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 39.34260000096401,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Couple Mugs",
+          "Forever Rose",
+          "Flower"
+        ]
+      },
+      {
+        "query": "somthing for my mom's bday, nothing above 1500 rupees",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Birthday",
+        "recipient": null,
+        "budget": [
+          null,
+          1500.0
+        ],
+        "preferences": [],
+        "ndcg": 0.4544086997472772,
+        "p10": 0.7,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 39.03419999551261,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Custom star map",
+          "Flower"
+        ]
+      },
+      {
+        "query": "my colleague is retiring next week, he loves watches",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Office Party + Retirement",
+        "recipient": "colleague",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.7848287690037501,
+        "p10": 0.8,
+        "results": 10,
+        "occ_ok": false,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 60.674200001813006,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Vintage Watch",
+          "Executive pens",
+          "Health & Fitness Gifts"
+        ]
+      },
+      {
+        "query": "need a diwali present for my team, budget 1k each",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Diwali + Office Party",
+        "recipient": "team",
+        "budget": [
+          null,
+          1000.0
+        ],
+        "preferences": [],
+        "ndcg": 0.4996412358255055,
+        "p10": 0.375,
+        "results": 8,
+        "occ_ok": false,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 47.51020000549033,
+        "understanding_ms": 0.2,
+        "top3": [
+          "lilies",
+          "Dark chocolate",
+          "Rollerball pens"
+        ]
+      },
+      {
+        "query": "anniversery gift for my wife, something personal",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Anniversary",
+        "recipient": "wife",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.9069212362975007,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 46.91109999839682,
+        "understanding_ms": 0.3,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Forever Rose"
+        ]
+      },
+      {
+        "query": "my 6 year old nephew's birthday",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Birthday",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.12941468425566366,
+        "p10": 0.3,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 40.71750000002794,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Snacks Box",
+          "Flower"
+        ]
+      },
+      {
+        "query": "housewarming for a friend who loves plants, around 1000",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Housewarming + Friendship Day",
+        "recipient": "friend",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.3473860836026445,
+        "p10": 0.4,
+        "results": 10,
+        "occ_ok": false,
+        "rec_ok": true,
+        "budget_ok": false,
+        "latency_ms": 47.548999995342456,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Housewarming Gifts",
+          "Indoor plants & planters",
+          "Recycled & Upcycled Gifts"
+        ]
+      },
+      {
+        "query": "thank you gift for my teacher",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Thank You + Teacher's Day",
+        "recipient": "teacher",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.5227452453223397,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": false,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 46.93590000533732,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Snacks Box",
+          "Physical Gift Cards"
+        ]
+      },
+      {
+        "query": "eco friendly gift for my sister who is into yoga",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Eco-conscious",
+        "recipient": "sister",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.914856882358379,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 36.27250000135973,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Bamboo lifestyle products",
+          "Organic skincare products",
+          "Recycled & Upcycled Gifts"
+        ]
+      },
+      {
+        "query": "farewell gift for my boss under 3000",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Office Party",
+        "recipient": "boss",
+        "budget": [
+          null,
+          3000.0
+        ],
+        "preferences": [],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 35.29960000014398,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Executive pens",
+          "Mental Wellness Gifts",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "baby shower present for my cousin, something cute",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Baby Shower",
+        "recipient": "baby",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8164139395905203,
+        "p10": 0.8333333333333334,
+        "results": 6,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 35.088399999949615,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Baby Shower & Newborn Gifts",
+          "Teddy bears",
+          "Soft toys & Plushies"
+        ]
+      },
+      {
+        "query": "valentines gift for husband",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Valentine's Day",
+        "recipient": "husband",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.9477344873475498,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 59.63649999466725,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Flower"
+        ]
+      },
+      {
+        "query": "something for dad who likes writing, below 1000",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Father's Day",
+        "recipient": "father",
+        "budget": [
+          null,
+          1000.0
+        ],
+        "preferences": [],
+        "ndcg": 0.7450968174957711,
+        "p10": 0.8571428571428571,
+        "results": 7,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 33.53609999612672,
+        "understanding_ms": 0.2,
+        "top3": [
+          "Executive pens",
+          "Recycled paper notebooks & journals",
+          "Fountain Pens"
+        ]
+      },
+      {
+        "query": "gift for a 10 yr old who loves music",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": null,
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.5637884576902256,
+        "p10": 1.0,
+        "results": 4,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 43.65559999860125,
+        "understanding_ms": 21.1,
+        "top3": [
+          "DJ & music mixer toys",
+          "Toy guitars",
+          "Drums & percussion sets"
+        ]
+      },
+      {
+        "query": "christmas hamper for clients between 1500 and 3000",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": null,
+        "occasion": "Christmas",
+        "recipient": null,
+        "budget": [
+          1500.0,
+          3000.0
+        ],
+        "preferences": [],
+        "ndcg": 0.8513342565678238,
+        "p10": 0.625,
+        "results": 8,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 35.226699998020194,
+        "understanding_ms": 0.3,
+        "top3": [
+          "Christmas Dry fruits hampers",
+          "Christmas Luxury Gift Hampers",
+          "Holi Luxury Gift Hampers"
+        ]
+      }
+    ],
+    "llm": [
+      {
+        "query": "Birthday",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Birthday",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.5991515743110455,
+        "p10": 0.8,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 2568.503700000292,
+        "understanding_ms": 2495.5,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Flower",
+          "Snacks Box"
+        ]
+      },
+      {
+        "query": "Wedding",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Wedding",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.6447482398302881,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 2739.661999999953,
+        "understanding_ms": 2672.8,
+        "top3": [
+          "Couple Mugs",
+          "Flower",
+          "Couple Perfumes"
+        ]
+      },
+      {
+        "query": "Valentine's Day",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Valentine's Day",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "romantic"
+        ],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 3257.2709000014584,
+        "understanding_ms": 3186.8,
+        "top3": [
+          "Couple Perfumes",
+          "Flower",
+          "Couple Mugs"
+        ]
+      },
+      {
+        "query": "Diwali",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Diwali",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "festive"
+        ],
+        "ndcg": 0.6166241376038859,
+        "p10": 0.6666666666666666,
+        "results": 9,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 2388.927899999544,
+        "understanding_ms": 2319.9,
+        "top3": [
+          "Diwali Dry fruits hampers",
+          "Diwali Luxury Gift Hampers",
+          "Cherry Blossom Candle"
+        ]
+      },
+      {
+        "query": "Anniversary",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Anniversary",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8791878722220235,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1655.2872999964166,
+        "understanding_ms": 1582.2,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Forever Rose"
+        ]
+      },
+      {
+        "query": "Office Party",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Office Party",
+        "recipient": "colleague",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "professional"
+        ],
+        "ndcg": 0.9477344873475498,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 1160.2751000027638,
+        "understanding_ms": 1054.5,
+        "top3": [
+          "Executive pens",
+          "Office wears",
+          "Rollerball pens"
+        ]
+      },
+      {
+        "query": "Father's Day",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Father's Day",
+        "recipient": "father",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.5645256079597236,
+        "p10": 0.8,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 1599.5639999964624,
+        "understanding_ms": 1536.8,
+        "top3": [
+          "Vintage Watch",
+          "Snacks Box",
+          "Custom star map"
+        ]
+      },
+      {
+        "query": "Mother's Day",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Mother's Day",
+        "recipient": "mother",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8358761963562928,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 1241.7456999974092,
+        "understanding_ms": 1170.7,
+        "top3": [
+          "Flower",
+          "Mental Wellness Gifts",
+          "Flower"
+        ]
+      },
+      {
+        "query": "Baby Shower",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Baby Shower",
+        "recipient": "mother",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "baby shower"
+        ],
+        "ndcg": 0.5506973620622038,
+        "p10": 0.3,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 1135.0925999940955,
+        "understanding_ms": 1060.3,
+        "top3": [
+          "Baby Shower & Newborn Gifts",
+          "Teddy bears",
+          "Flower"
+        ]
+      },
+      {
+        "query": "Graduation",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": "timeout",
+        "occasion": "Graduation",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8358894066114714,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 5324.578600004315,
+        "understanding_ms": 5277.3,
+        "top3": [
+          "Executive pens",
+          "Physical Gift Cards",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "Housewarming",
+        "kind": "occasion",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Housewarming",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "housewarming"
+        ],
+        "ndcg": 0.7507462889698504,
+        "p10": 0.8,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 3015.71800000238,
+        "understanding_ms": 2949.5,
+        "top3": [
+          "Housewarming Gifts",
+          "Indoor plants & planters",
+          "Recycled & Upcycled Gifts"
+        ]
+      },
+      {
+        "query": "Suggest a romantic gift for my girlfriend under ₹2,000.",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": "timeout",
+        "occasion": "Romantic",
+        "recipient": "girlfriend",
+        "budget": [
+          null,
+          2000.0
+        ],
+        "preferences": [],
+        "ndcg": 0.901447006056365,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 5308.487800000876,
+        "understanding_ms": 5263.6,
+        "top3": [
+          "Couple Mugs",
+          "Forever Rose",
+          "Flower"
+        ]
+      },
+      {
+        "query": "somthing for my mom's bday, nothing above 1500 rupees",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": "timeout",
+        "occasion": "Birthday",
+        "recipient": null,
+        "budget": [
+          null,
+          1500.0
+        ],
+        "preferences": [],
+        "ndcg": 0.4544086997472772,
+        "p10": 0.7,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 5351.402500004042,
+        "understanding_ms": 5305.2,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Custom star map",
+          "Flower"
+        ]
+      },
+      {
+        "query": "my colleague is retiring next week, he loves watches",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Retirement",
+        "recipient": "colleague",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "watches"
+        ],
+        "ndcg": 0.8274601406735915,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 4152.3939999970025,
+        "understanding_ms": 4068.1,
+        "top3": [
+          "Vintage Watch",
+          "Health & Fitness Gifts",
+          "Rose gold watch"
+        ]
+      },
+      {
+        "query": "need a diwali present for my team, budget 1k each",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Diwali",
+        "recipient": "colleague",
+        "budget": [
+          null,
+          1000.0
+        ],
+        "preferences": [
+          "team gift"
+        ],
+        "ndcg": 0.4996412358255055,
+        "p10": 0.375,
+        "results": 8,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 1394.6539999960805,
+        "understanding_ms": 1317.6,
+        "top3": [
+          "lilies",
+          "Dark chocolate",
+          "Executive pens"
+        ]
+      },
+      {
+        "query": "anniversery gift for my wife, something personal",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Anniversary",
+        "recipient": "wife",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "personal"
+        ],
+        "ndcg": 0.8459222482069374,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 2560.2873000025284,
+        "understanding_ms": 2485.8,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Forever Rose"
+        ]
+      },
+      {
+        "query": "my 6 year old nephew's birthday",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": "timeout",
+        "occasion": "Birthday",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.12941468425566366,
+        "p10": 0.3,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 7023.375800003123,
+        "understanding_ms": 6968.6,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Snacks Box",
+          "Flower"
+        ]
+      },
+      {
+        "query": "housewarming for a friend who loves plants, around 1000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Housewarming",
+        "recipient": "friend",
+        "budget": [
+          null,
+          1200.0
+        ],
+        "preferences": [
+          "plants",
+          "housewarming"
+        ],
+        "ndcg": 0.570265520824231,
+        "p10": 0.8333333333333334,
+        "results": 6,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 4179.038899994339,
+        "understanding_ms": 4087.3,
+        "top3": [
+          "Indoor plants & planters",
+          "lilies",
+          "Marigold"
+        ]
+      },
+      {
+        "query": "thank you gift for my teacher",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Teacher's Day",
+        "recipient": "teacher",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "thank you",
+          "appreciative"
+        ],
+        "ndcg": 0.47251714341676576,
+        "p10": 0.5,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1764.186400003382,
+        "understanding_ms": 1689.4,
+        "top3": [
+          "Physical Gift Cards",
+          "Recycled paper notebooks & journals",
+          "Executive pens"
+        ]
+      },
+      {
+        "query": "eco friendly gift for my sister who is into yoga",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Eco-conscious",
+        "recipient": "sister",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "eco-friendly",
+          "yoga"
+        ],
+        "ndcg": 0.914856882358379,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 2192.625299998326,
+        "understanding_ms": 2138.5,
+        "top3": [
+          "Bamboo lifestyle products",
+          "Organic skincare products",
+          "Recycled & Upcycled Gifts"
+        ]
+      },
+      {
+        "query": "farewell gift for my boss under 3000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Retirement",
+        "recipient": "boss",
+        "budget": [
+          null,
+          3000.0
+        ],
+        "preferences": [
+          "professional",
+          "farewell"
+        ],
+        "ndcg": 0.7713775964055285,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 4043.2375999953365,
+        "understanding_ms": 3953.7,
+        "top3": [
+          "Mental Wellness Gifts",
+          "Executive pens",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "baby shower present for my cousin, something cute",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Baby Shower",
+        "recipient": "cousin",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "cute"
+        ],
+        "ndcg": 0.8365536977494958,
+        "p10": 0.8571428571428571,
+        "results": 7,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 2037.6106000039726,
+        "understanding_ms": 1974.8,
+        "top3": [
+          "Baby Shower & Newborn Gifts",
+          "Teddy bears",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "valentines gift for husband",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Valentine's Day",
+        "recipient": "husband",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "romantic"
+        ],
+        "ndcg": 0.9477344873475498,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1393.2486999983666,
+        "understanding_ms": 1285.1,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Flower"
+        ]
+      },
+      {
+        "query": "something for dad who likes writing, below 1000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Father's Day",
+        "recipient": "father",
+        "budget": [
+          null,
+          1000.0
+        ],
+        "preferences": [
+          "writing"
+        ],
+        "ndcg": 0.7462097627311274,
+        "p10": 0.6,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1079.181699999026,
+        "understanding_ms": 1032.4,
+        "top3": [
+          "Fountain Pens",
+          "Recycled paper notebooks & journals",
+          "Executive pens"
+        ]
+      },
+      {
+        "query": "gift for a 10 yr old who loves music",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Child",
+        "recipient": "child",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "music"
+        ],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": false,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1165.120300000126,
+        "understanding_ms": 1104.9,
+        "top3": [
+          "DJ & music mixer toys",
+          "Toy guitars",
+          "Drums & percussion sets"
+        ]
+      },
+      {
+        "query": "christmas hamper for clients between 1500 and 3000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Christmas",
+        "recipient": "client",
+        "budget": [
+          1500.0,
+          3000.0
+        ],
+        "preferences": [
+          "professional",
+          "festive"
+        ],
+        "ndcg": 0.8793501020150799,
+        "p10": 0.6,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1200.533600000199,
+        "understanding_ms": 1118.6,
+        "top3": [
+          "Christmas Dry fruits hampers",
+          "Christmas Luxury Gift Hampers",
+          "Mental Wellness Gifts"
+        ]
+      }
+    ],
+    "routed": [
+      {
+        "query": "Birthday",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Birthday",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.6627723625099973,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 63.313700004073326,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Flower",
+          "Snacks Box"
+        ]
+      },
+      {
+        "query": "Wedding",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Wedding",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.7136029928573593,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 60.46580000111135,
+        "understanding_ms": 0.0,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Engagement Gift"
+        ]
+      },
+      {
+        "query": "Valentine's Day",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Valentine's Day",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 54.82219999976223,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Couple Perfumes",
+          "Couple Mugs",
+          "Flower"
+        ]
+      },
+      {
+        "query": "Diwali",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Diwali",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.46900009332067477,
+        "p10": 0.75,
+        "results": 4,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 43.81160000048112,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Diwali Dry fruits hampers",
+          "Diwali Luxury Gift Hampers",
+          "Kashmiri Suits"
+        ]
+      },
+      {
+        "query": "Anniversary",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Anniversary",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8874582952544261,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 48.04109999531647,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Forever Rose"
+        ]
+      },
+      {
+        "query": "Office Party",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Office Party",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 46.9987000033143,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Executive pens",
+          "Office wears",
+          "Fountain Pens"
+        ]
+      },
+      {
+        "query": "Father's Day",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Father's Day",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8043890678175752,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 41.05780000099912,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Vintage Watch",
+          "Metallic Gold Watch",
+          "Metallic silver watch"
+        ]
+      },
+      {
+        "query": "Mother's Day",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Mother's Day",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 50.28809999930672,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Flower",
+          "Mental Wellness Gifts",
+          "Flower"
+        ]
+      },
+      {
+        "query": "Baby Shower",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Baby Shower",
+        "recipient": "baby",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8020713147301064,
+        "p10": 0.8333333333333334,
+        "results": 6,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 41.142000001855195,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Baby Shower & Newborn Gifts",
+          "Teddy bears",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "Graduation",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Graduation",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.8358894066114714,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 42.678400001022965,
+        "understanding_ms": 0.1,
+        "top3": [
+          "Executive pens",
+          "Physical Gift Cards",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "Housewarming",
+        "kind": "occasion",
+        "mode": "rules",
+        "route": "rules_exact_match",
+        "fallback": null,
+        "occasion": "Housewarming",
+        "recipient": null,
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.7484282537574317,
+        "p10": 1.0,
+        "results": 7,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 38.34920000372222,
+        "understanding_ms": 0.0,
+        "top3": [
+          "Housewarming Gifts",
+          "Indoor plants & planters",
+          "Recycled & Upcycled Gifts"
+        ]
+      },
+      {
+        "query": "Suggest a romantic gift for my girlfriend under ₹2,000.",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Valentine's Day",
+        "recipient": "girlfriend",
+        "budget": [
+          null,
+          2000.0
+        ],
+        "preferences": [
+          "romantic"
+        ],
+        "ndcg": 0.9008240627729516,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1313.1883000023663,
+        "understanding_ms": 1219.7,
+        "top3": [
+          "Couple Mugs",
+          "Flower",
+          "Forever Rose"
+        ]
+      },
+      {
+        "query": "somthing for my mom's bday, nothing above 1500 rupees",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Birthday",
+        "recipient": "mother",
+        "budget": [
+          null,
+          1500.0
+        ],
+        "preferences": [
+          "mother"
+        ],
+        "ndcg": 0.6144780730204823,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1198.045999997703,
+        "understanding_ms": 1120.1,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Flower",
+          "Custom star map"
+        ]
+      },
+      {
+        "query": "my colleague is retiring next week, he loves watches",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Retirement",
+        "recipient": "colleague",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "watches"
+        ],
+        "ndcg": 0.8274601406735915,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1752.1183000062592,
+        "understanding_ms": 1677.8,
+        "top3": [
+          "Vintage Watch",
+          "Health & Fitness Gifts",
+          "Rose gold watch"
+        ]
+      },
+      {
+        "query": "need a diwali present for my team, budget 1k each",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Diwali",
+        "recipient": "colleague",
+        "budget": [
+          null,
+          1000.0
+        ],
+        "preferences": [
+          "team gift"
+        ],
+        "ndcg": 0.4996412358255055,
+        "p10": 0.375,
+        "results": 8,
+        "occ_ok": true,
+        "rec_ok": false,
+        "budget_ok": true,
+        "latency_ms": 1962.6785000000382,
+        "understanding_ms": 1888.0,
+        "top3": [
+          "lilies",
+          "Dark chocolate",
+          "Executive pens"
+        ]
+      },
+      {
+        "query": "anniversery gift for my wife, something personal",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Anniversary",
+        "recipient": "wife",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "personal"
+        ],
+        "ndcg": 0.8459222482069374,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1141.2941000016872,
+        "understanding_ms": 1065.4,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Forever Rose"
+        ]
+      },
+      {
+        "query": "my 6 year old nephew's birthday",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Birthday",
+        "recipient": "nephew",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "6 year old"
+        ],
+        "ndcg": 0.7846170207230129,
+        "p10": 0.8,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 2385.323000002245,
+        "understanding_ms": 2306.1,
+        "top3": [
+          "Arts & craft kits",
+          "Teddy bears",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "housewarming for a friend who loves plants, around 1000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Housewarming",
+        "recipient": "friend",
+        "budget": [
+          null,
+          1200.0
+        ],
+        "preferences": [
+          "plants",
+          "housewarming"
+        ],
+        "ndcg": 0.570265520824231,
+        "p10": 0.8333333333333334,
+        "results": 6,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1733.3069000014802,
+        "understanding_ms": 1666.8,
+        "top3": [
+          "Indoor plants & planters",
+          "lilies",
+          "Marigold"
+        ]
+      },
+      {
+        "query": "thank you gift for my teacher",
+        "kind": "natural language",
+        "mode": "rules",
+        "route": "rules",
+        "fallback": "timeout",
+        "occasion": "Thank You + Teacher's Day",
+        "recipient": "teacher",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [],
+        "ndcg": 0.5227452453223397,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": false,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 5332.70690000063,
+        "understanding_ms": 5267.3,
+        "top3": [
+          "Seasonal Gift Cards",
+          "Snacks Box",
+          "Physical Gift Cards"
+        ]
+      },
+      {
+        "query": "eco friendly gift for my sister who is into yoga",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Eco-conscious",
+        "recipient": "sister",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "eco-friendly",
+          "yoga"
+        ],
+        "ndcg": 0.914856882358379,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 3347.2188000014285,
+        "understanding_ms": 3273.6,
+        "top3": [
+          "Bamboo lifestyle products",
+          "Organic skincare products",
+          "Recycled & Upcycled Gifts"
+        ]
+      },
+      {
+        "query": "farewell gift for my boss under 3000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Retirement",
+        "recipient": "boss",
+        "budget": [
+          null,
+          3000.0
+        ],
+        "preferences": [
+          "professional",
+          "farewell"
+        ],
+        "ndcg": 0.7713775964055285,
+        "p10": 0.9,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1147.3813000047812,
+        "understanding_ms": 1063.4,
+        "top3": [
+          "Mental Wellness Gifts",
+          "Executive pens",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "baby shower present for my cousin, something cute",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Baby Shower",
+        "recipient": "cousin",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "cute"
+        ],
+        "ndcg": 0.8365536977494958,
+        "p10": 0.8571428571428571,
+        "results": 7,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1284.6497999998974,
+        "understanding_ms": 1228.7,
+        "top3": [
+          "Baby Shower & Newborn Gifts",
+          "Teddy bears",
+          "Seasonal Gift Cards"
+        ]
+      },
+      {
+        "query": "valentines gift for husband",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Valentine's Day",
+        "recipient": "husband",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "romantic"
+        ],
+        "ndcg": 0.9477344873475498,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1200.2190999992308,
+        "understanding_ms": 1085.7,
+        "top3": [
+          "Couple Mugs",
+          "Couple Perfumes",
+          "Flower"
+        ]
+      },
+      {
+        "query": "something for dad who likes writing, below 1000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Father's Day",
+        "recipient": "father",
+        "budget": [
+          null,
+          1000.0
+        ],
+        "preferences": [
+          "writing"
+        ],
+        "ndcg": 0.7462097627311274,
+        "p10": 0.6,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1996.9352999978582,
+        "understanding_ms": 1947.7,
+        "top3": [
+          "Fountain Pens",
+          "Recycled paper notebooks & journals",
+          "Executive pens"
+        ]
+      },
+      {
+        "query": "gift for a 10 yr old who loves music",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Child",
+        "recipient": "child",
+        "budget": [
+          null,
+          null
+        ],
+        "preferences": [
+          "music"
+        ],
+        "ndcg": 1.0,
+        "p10": 1.0,
+        "results": 10,
+        "occ_ok": false,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1219.9902000065777,
+        "understanding_ms": 1165.2,
+        "top3": [
+          "DJ & music mixer toys",
+          "Toy guitars",
+          "Drums & percussion sets"
+        ]
+      },
+      {
+        "query": "christmas hamper for clients between 1500 and 3000",
+        "kind": "natural language",
+        "mode": "llm",
+        "route": "llm",
+        "fallback": null,
+        "occasion": "Christmas",
+        "recipient": "client",
+        "budget": [
+          1500.0,
+          3000.0
+        ],
+        "preferences": [
+          "professional",
+          "festive"
+        ],
+        "ndcg": 0.8793501020150799,
+        "p10": 0.6,
+        "results": 10,
+        "occ_ok": true,
+        "rec_ok": true,
+        "budget_ok": true,
+        "latency_ms": 1379.7161999973468,
+        "understanding_ms": 1293.8,
+        "top3": [
+          "Christmas Dry fruits hampers",
+          "Christmas Luxury Gift Hampers",
+          "Mental Wellness Gifts"
+        ]
+      }
+    ]
+  }
+}

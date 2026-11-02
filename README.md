@@ -4,11 +4,13 @@ Type an occasion — *"Diwali"*, *"Valentine's Day"*, or free text such as *"som
 
 The engine is a **hybrid recommender**: MiniLM sentence embeddings searched with **FAISS**, combined with IDF-weighted keyword relevance and a curated **occasion → concept** layer. It runs fully locally, with no paid API keys, and falls back to TF-IDF automatically if the embedding model is unavailable.
 
+An **optional Gemini LLM layer** can interpret complex natural-language requests (*"something for my mom's bday, nothing above 1500 rupees"*) into a structured query of occasion, recipient, budget, themes and preferences. That query then feeds the same retrieval and ranking engine. The LLM never sees or produces product data, and the app works identically without an API key ([details](#optional-llm-query-understanding-gemini), [evaluation](docs/llm_evaluation.md)).
+
 | Occasion input | Results (Valentine's Day) |
 |---|---|
 | ![Occasion input](screenshots/01-occasion-input.png) | ![Results](screenshots/02-results-valentines.png) |
 
-More screenshots: [Diwali](screenshots/03-results-diwali.png) · [free text + budget](screenshots/04-free-text-budget.png) · [empty state](screenshots/05-empty-state.png) · [mobile (390 px)](screenshots/06-mobile.png) · [Graduation](screenshots/07-results-graduation.png) · [product detail](screenshots/08-product-detail.png). They are regenerated from the running app with `node e2e/capture-screenshots.mjs` (in `frontend/`).
+More screenshots: [Diwali](screenshots/03-results-diwali.png) · [free text + budget](screenshots/04-free-text-budget.png) · [empty state](screenshots/05-empty-state.png) · [mobile (390 px)](screenshots/06-mobile.png) · [Graduation](screenshots/07-results-graduation.png) · [product detail](screenshots/08-product-detail.png) · [natural-language query understood by Gemini](screenshots/09-natural-language-llm.png). They are regenerated from the running app with `node e2e/capture-screenshots.mjs` (in `frontend/`).
 
 > **Note on product images.** Every card uses the product's real `mainImage` URL, unchanged. At the time of writing (31 Oct 2026), the images cannot be loaded from the source. I checked all 110 URLs individually with full `GET` requests:
 >
@@ -28,13 +30,14 @@ More screenshots: [Diwali](screenshots/03-results-diwali.png) · [free text + bu
 4. [Tech stack](#tech-stack)
 5. [Dataset: schema, mapping and filtering](#dataset-schema-mapping-and-filtering)
 6. [Recommendation pipeline](#recommendation-pipeline)
-7. [API](#api)
-8. [Setup and running (Windows)](#setup-and-running-windows)
-9. [Testing](#testing)
-10. [Manual evaluation](#manual-evaluation)
-11. [Limitations](#limitations)
-12. [Future improvements](#future-improvements)
-13. [Use of AI coding assistants](#use-of-ai-coding-assistants)
+7. [Optional LLM query understanding (Gemini)](#optional-llm-query-understanding-gemini)
+8. [API](#api)
+9. [Setup and running (Windows)](#setup-and-running-windows)
+10. [Testing](#testing)
+11. [Manual evaluation](#manual-evaluation)
+12. [Limitations](#limitations)
+13. [Future improvements](#future-improvements)
+14. [Use of AI coding assistants](#use-of-ai-coding-assistants)
 
 ---
 
@@ -58,7 +61,8 @@ Given a product catalog (supplied as `products.json` with the assignment), recom
 - **Product detail panel:** full description, explanation, matched themes and the per-signal score breakdown (semantic, keyword, occasion fit).
 - **Graceful degradation:** TF-IDF fallback if the model can't load, and a NumPy index if FAISS can't load. Both are reported by `/api/health`.
 - **Shareable searches:** the query is synced to `?q=` in the URL.
-- **Tests:** 92 backend tests (pytest) and 20 browser end-to-end tests (Playwright in Chrome), plus an offline ranking evaluation (`scripts/ablation.py`).
+- **Optional LLM query understanding (Gemini):** structured extraction of occasion, recipient, budget, themes and preferences from free text. It is validated, grounded and cached, with a circuit breaker and automatic fallback to the rules. It is off by default.
+- **Tests:** 146 backend tests (pytest, including 49 for the LLM layer with no network calls) and 22 browser end-to-end tests (Playwright in Chrome), plus two offline evaluations (`scripts/ablation.py`, `scripts/compare_llm.py`).
 
 ## Architecture
 
@@ -72,7 +76,8 @@ products.json ──► data_loader ──► preprocessing ──► embedding_
                          └───────────────────────────────────────────────────────────────────────┘
 
 React (Vite) ──POST /api/recommend──► FastAPI route ──► RecommendationEngine.recommend()
-                                                          1. occasion_service.understand()
+                                                          1. query_understanding: rules, or the
+                                                             optional Gemini LLM → validated intent
                                                           2. filter (price / category)
                                                           3. query embedding (raw ⊕ occasion expansion)
                                                           4. FAISS top-K ∪ keyword hits
@@ -95,6 +100,9 @@ backend/
       embedding_service.py      SentenceTransformer encoder, TF-IDF fallback, embedding cache
       vector_store.py           FAISS IndexFlatIP (+ NumPy fallback)
       occasion_service.py       concept library, occasion profiles, matching, budget parsing
+      query_understanding.py    rules vs optional LLM: routing, fallback, circuit breaker, cache
+      llm/providers.py          LLM provider interface + Gemini REST client
+      llm/query_parser.py       prompt, response schema, validation of the LLM's structured output
       recommendation_service.py the pipeline above
     utils/scoring.py            pure scoring functions
   data/products.json            the supplied catalog (unmodified)
@@ -102,6 +110,9 @@ backend/
   tests/                        pytest suite
   scripts/relevance_judgments.py  hand-written graded judgments for offline evaluation
   scripts/ablation.py         compares ranking configurations (nDCG@10, P@10)
+  scripts/compare_llm.py      rules vs LLM vs routed: relevance, understanding, latency, cost, fallback
+docs/llm_evaluation.md        generated comparison report (+ .json with every query)
+.env.example                  documents the optional LLM settings (copy to .env)
 frontend/
   src/App.jsx, api.js, components/{SearchPanel,Results,ProductCard}.jsx
   e2e/app.spec.js             Playwright browser tests
@@ -117,6 +128,7 @@ screenshots/
 | Embeddings | `sentence-transformers/all-MiniLM-L6-v2` (sentence-transformers 3.3, PyTorch CPU) | small (~90 MB), fast on CPU, strong for short texts |
 | Vector search | FAISS CPU 1.9 (`IndexFlatIP`) | exact cosine search with in-index ID filtering |
 | Fallback / NLP | scikit-learn 1.6 (TF-IDF), NumPy 2.2 | no network needed |
+| Optional LLM | Google Gemini (`gemini-3.1-flash-lite`) via its REST API with `httpx` | structured JSON output; no vendor SDK needed |
 | Frontend | React 18, Vite 5, Tailwind CSS 3, lucide-react | |
 | Tests | pytest 8, FastAPI TestClient (httpx) | |
 
@@ -245,6 +257,99 @@ A test checks that every quoted phrase occurs in the listing.
 
 The UI shows a "Semantic ranking" or "Keyword fallback ranking" badge from the response's `recommendation_mode`.
 
+## Optional LLM query understanding (Gemini)
+
+An optional generative-AI layer turns complex natural-language requests into a structured query. It is **off by default** (`LLM_ENABLED=false`); without it, or without an API key, the rule-based understanding described above is used and everything works the same.
+
+```
+user text ─► routing ─┬─ exact occasion name ("Diwali") ─────────────► rule-based understanding ─┐
+                      └─ anything else ─► Gemini ─► JSON ─► validate ─► OccasionIntent ──────────┤
+                                            │ timeout / error / invalid / no key / circuit open    │
+                                            └──────────────────────────► rule-based understanding ─┤
+                                                                                                   ▼
+                         existing engine, unchanged: MiniLM embedding ─► FAISS ─► hybrid scoring ─►
+                         eligibility & price filters ─► relevance gate ─► MMR ─► grounded explanations
+```
+
+**What the LLM returns.** This is a real response from `gemini-3.1-flash-lite` for *"Suggest a romantic gift for my girlfriend under ₹2,000."*:
+
+```json
+{
+  "occasion": "Valentine's Day",
+  "recipient": "girlfriend",
+  "min_price": null,
+  "max_price": 2000,
+  "themes": ["romance", "personalised", "flowers", "chocolates", "jewellery"],
+  "preferences": ["romantic"]
+}
+```
+
+Gemini is asked for JSON with a **response schema** (`responseMimeType: application/json`) at temperature 0. The validated result is converted into the engine's existing `OccasionIntent`:
+
+- the occasion maps to its curated profile
+- the recipient adds that cue's themes (e.g. "mother" → wellness, flowers)
+- the themes are added as occasion concepts
+- the preferences and themes enrich the query embedding
+
+Keyword relevance stays tied to the shopper's own words.
+
+**Product grounding.** The LLM cannot affect product facts:
+
+- It is **never shown catalog data**. The prompt contains only the shopper's text and the lists of known occasions and themes, and a test asserts no product title is sent.
+- **`themes` is restricted by the schema** (`enum`) to the existing concept library, and anything else is dropped during validation.
+- **Unknown fields are discarded.** An injected `"products": [{"name": "Fake Rolex", "price": 1}]` is ignored; a test checks every returned product ID, name, price and stock against `products.json`.
+- **Prices are validated** (finite, non-negative, inverted ranges swapped). A budget from the LLM is accepted only if the shopper's words contain an amount, and a *minimum* only with lower-bound wording ("at least", "between"…). An explicit amount parsed by the deterministic rules always wins.
+- Retrieval, eligibility (approved, ACTIVE, not deleted, in stock), scoring and explanations are the unchanged rule-based engine.
+
+**Routing.** A query that *is* a known occasion name ("Diwali", "fathers day") is resolved with certainty by the rules, so it skips the LLM: no added latency or cost. Measured below, sending those queries to the LLM made results *worse*, because generic extra themes diluted the curated profiles. `use_llm: true` in a request still forces the LLM.
+
+**Reliability.**
+
+| Situation | Behaviour | Reported as |
+|---|---|---|
+| `LLM_ENABLED=false` (default) | rules | `understanding_mode: "rules"` |
+| No API key | rules | `llm_fallback_reason: "missing_key"`, `/api/health` `llm.status: "missing_key"` |
+| Timeout (5 s), HTTP error, network error | rules, same results as rules mode | `timeout`, `http_error`, `network` |
+| HTTP 429 | rules | `rate_limited` |
+| Non-JSON or invalid fields | rules | `invalid_response` |
+| 3 failures in a row | the LLM is skipped for 60 s (circuit breaker), so users don't each wait for a timeout | `circuit_open` |
+
+Responses are cached per normalised query (LRU, 256 entries), so repeated searches cost nothing.
+
+**Choice of model.** `gemini-3.1-flash-lite` is Google's low-cost model for simple extraction ($0.25 / 1M input and $1.50 / 1M output tokens, Standard tier). During development `gemini-3.5-flash-lite` stopped responding for this key (every call timed out), which is exactly the failure the fallback and circuit breaker handle. The model is configurable with `GEMINI_MODEL`.
+
+### Rules vs LLM: measured comparison
+
+`python -m scripts.compare_llm` runs 26 queries against the live API: the 11 occasion names plus 15 natural-language requests with typos, recipients and budgets. The full per-query report is in [docs/llm_evaluation.md](docs/llm_evaluation.md). Latest run (1 Nov 2026):
+
+| Metric | Query set | Rules | LLM on every query | **Routed (default)** |
+|---|---|---|---|---|
+| nDCG@10 | All 26 | 0.743 | 0.732 | **0.792** |
+| nDCG@10 | 11 occasion names | 0.811 | 0.748 | 0.811 (same as rules) |
+| nDCG@10 | 15 natural-language | 0.692 | 0.720 | **0.777** |
+| Occasion understood | natural-language | 73% | 93% | 87% |
+| Recipient extracted | natural-language | 67% | 80% | 93% |
+| Budget correct | natural-language | 93% | 100% | 100% |
+| Latency p50 / p95 | All | 40 / 60 ms | 2,291 / 5,351 ms | 1,173 / 3,347 ms |
+| LLM calls that timed out and fell back | | n/a | 4 of 22 | 1 of 14 |
+| API cost per 1,000 queries | this query mix | $0 | $0.20 | $0.13 |
+| Fallback reliability | 7 failure scenarios × 26 queries | n/a | identical to rules in 182/182, 0 errors | same |
+
+What this does and does not show:
+
+- **Query understanding improves clearly** on natural-language requests: recipient 67% → 93%, budget 93% → 100%, occasion 73% → 87–93%. The biggest wins are queries where the rules miss the real intent: *"my 6 year old nephew's birthday"* (nDCG 0.13 → 0.78) and *"gift for a 10 yr old who loves music"* (0.56 → 1.00).
+- **Recommendation relevance improves only with routing, and the evidence is limited**: +0.085 nDCG on 15 natural-language queries in this run (+0.036 and +0.046 in two earlier runs, before the fixes listed below). The relevance labels were hand-written by me, the sample is small, and results vary between runs, so **this is not evidence of a general accuracy improvement**. Sending *every* query to the LLM was no better than rules overall (0.732 vs 0.743), because it hurt plain occasion names.
+- **Latency is the main cost.** The LLM adds about 1.2 s at the median and has a heavy tail: every run had timeouts (2, 2 and 5 calls), and one call took 7 s because the 5 s timeout applies to each network phase. Routing keeps plain occasion names fast.
+- **API cost is small**: about 470 input and 100 output tokens per call, about $0.13 per 1,000 queries for this mix (Google's free tier costs $0 within its rate limits).
+- **Fallback is reliable**: timeouts, HTTP and network errors, invalid JSON, a *real* 1 ms timeout against the live endpoint, and a missing key all returned exactly the rule-based results with no errors.
+
+Fixes found by running this comparison:
+
+- **Rule budget parser:** *"nothing above 1500 rupees"* was read as a *minimum* of ₹1,500. Negated bounds are now maximums.
+- **LLM minimum price:** an LLM minimum is only accepted with lower-bound wording, so "around 1000" no longer hides a ₹719 best match.
+- **Routing:** exact occasion names skip the LLM.
+- **Grading consistency:** relevance grading now uses the same "around ₹1,000 means at most ₹1,500" rule as the budget-accuracy metric, so over-budget results get no credit.
+
 ## API
 
 Interactive docs: **http://localhost:8000/docs**
@@ -264,9 +369,12 @@ Interactive docs: **http://localhost:8000/docs**
   "embedding_model_status": "loaded",
   "fallback_reason": null,
   "vector_store": "faiss",
-  "vector_store_fallback_reason": null
+  "vector_store_fallback_reason": null,
+  "llm": { "enabled": true, "status": "ready", "provider": "gemini", "model": "gemini-3.1-flash-lite", "detail": null }
 }
 ```
+
+`llm.status` is `ready`, `disabled`, `missing_key` or `unsupported_provider`. Health checks never call the LLM.
 
 ### `GET /api/occasions`
 
@@ -278,11 +386,16 @@ Returns the categories present among eligible products, with inferred labels: `{
 
 ### `POST /api/recommend`
 
-Request (only `occasion` is required):
+Request: send either `query` (natural language) or `occasion`; every other field is optional.
 
 ```json
-{ "occasion": "Valentine's Day", "limit": 10, "min_price": null, "max_price": null, "category": null }
+{ "query": "Suggest a romantic gift for my girlfriend under ₹2,000", "limit": 10,
+  "min_price": null, "max_price": null, "category": null, "use_llm": null }
 ```
+
+- `occasion` keeps working exactly as before; when both are given, `query` is used.
+- `use_llm`: `null` = server setting with routing, `true` = force the LLM, `false` = rules only.
+- Explicit `min_price`/`max_price` always override a budget found in the text.
 
 Response (truncated to one item):
 
@@ -294,7 +407,15 @@ Response (truncated to one item):
     "match_type": "exact",
     "concepts": ["romance and love", "flowers", "chocolates and sweet treats", "fragrance", "jewellery", "..."],
     "applied_min_price": null,
-    "applied_max_price": null
+    "applied_max_price": null,
+    "recipient": null,
+    "preferences": [],
+    "understanding_mode": "rules",
+    "understanding_route": "rules",
+    "llm_provider": null,
+    "llm_model": null,
+    "llm_fallback_reason": null,
+    "understanding_latency_ms": 0.4
   },
   "total_results": 10,
   "recommendation_mode": "semantic",
@@ -322,7 +443,12 @@ Response (truncated to one item):
 }
 ```
 
-- `match_type` is one of `exact | phrase | fuzzy | semantic | none | generic`.
+- `match_type` is one of `exact | phrase | fuzzy | semantic | none | generic`, or `llm` when the LLM interpreted the query.
+- **Query understanding fields:** the parsed occasion is `matched_occasion`, the budget is `applied_min_price` / `applied_max_price`, plus `recipient` and `preferences`.
+  - `understanding_mode` is `llm` or `rules`.
+  - `understanding_route` is `llm`, `rules` or `rules_exact_match`.
+  - `llm_fallback_reason` explains any fallback (`timeout`, `rate_limited`, `http_error`, `network`, `invalid_response`, `missing_key`, `circuit_open`).
+- Relevance scores, score breakdowns and explanations are unchanged in both modes, and every product field comes from `products.json`.
 - `final_price` is the price after discount, which is what the price filters use.
 - An empty result returns `total_results: 0` and a `message`, such as *"No relevant products found for this occasion. Try another occasion."*
 - Validation errors (empty occasion, `limit` outside 1–24, negative prices, `min_price > max_price`) return **422** with a readable `detail`.
@@ -331,6 +457,11 @@ Response (truncated to one item):
 # PowerShell example
 Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/recommend `
   -ContentType "application/json" -Body '{"occasion": "Diwali", "limit": 5}'
+
+# Natural-language query (uses the LLM when enabled, otherwise the rules)
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/recommend `
+  -ContentType "application/json; charset=utf-8" `
+  -Body '{"query": "somthing for my mom''s bday, nothing above 1500 rupees", "limit": 5}'
 ```
 
 ## Setup and running (Windows)
@@ -365,6 +496,26 @@ Optional environment variables:
 | `REC_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | allowed frontend origins |
 | `REC_DATA_PATH` | `backend/data/products.json` | catalog location |
 
+### Enabling the optional LLM layer
+
+Copy `.env.example` (repository root) to `.env`, which is git-ignored, then set:
+
+```
+LLM_ENABLED=true
+GEMINI_API_KEY=<your key from https://aistudio.google.com/apikey>
+```
+
+Restart the backend. `/api/health` should then show `"llm": {"status": "ready", ...}` and the UI shows a "Gemini understanding" badge. The backend reads `.env` from the repository root or `backend/`, and real environment variables override it. Other settings:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `LLM_ENABLED` | `false` | turn the LLM layer on |
+| `LLM_PROVIDER` | `gemini` | provider (only Gemini is implemented; the interface is in `llm/providers.py`) |
+| `GEMINI_API_KEY` | (none) | API key, sent only in a request header and never logged |
+| `GEMINI_MODEL` | `gemini-3.1-flash-lite` | any Gemini model that supports JSON output |
+| `LLM_TIMEOUT_SECONDS` | `5` | per-call timeout before falling back to rules |
+| `LLM_INPUT_PRICE_PER_M`, `LLM_OUTPUT_PRICE_PER_M` | `0.25`, `1.50` | USD per 1M tokens, used only by `scripts/compare_llm.py` |
+
 ### Frontend
 
 In a second terminal:
@@ -384,18 +535,20 @@ cd backend
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Result: **92 passed** (about 30–50 s; the first run also downloads the model).
+Result: **146 passed** (about 30–80 s; the first run also downloads the model).
+
+The suite **never calls a real LLM**: `conftest.py` forces `LLM_ENABLED=false`, LLM tests use a fake provider, and the Gemini client is tested with `httpx.MockTransport`.
 
 ### Frontend end-to-end tests (Playwright)
 
-They use the locally installed Google Chrome (no browser download). They start the backend and frontend automatically if they are not already running.
+They use the locally installed Google Chrome (no browser download). The suite starts its **own** backend on port 8001 (with the LLM disabled) and frontend on port 5174, so it is deterministic, never makes paid API calls, and doesn't interfere with a dev server you have running.
 
 ```powershell
 cd frontend
 npm run test:e2e
 ```
 
-Result: **20 passed** in Chrome. Covered:
+Result: **22 passed** in Chrome. Covered:
 
 - the labelled input, search button, Enter key and suggestion chips
 - results rendering below the input, with rank, category, price, stock, match score and reason
@@ -409,8 +562,9 @@ Result: **20 passed** in Chrome. Covered:
 - `?q=` deep links
 - a 375 px mobile layout with no horizontal overflow
 - the live engine-status badge, sorting (ranks preserved), the product detail panel (score breakdown, Esc to close) and removable filter chips
+- natural-language queries sent as `query`; how an LLM-understood result is displayed (Gemini badge, recipient, preferences) and how a fallback is explained to the user
 
-Only the loading, error and image-success tests intercept network calls; everything else runs against the real API and catalog.
+Only the loading, error, image-success and LLM-display tests intercept network calls. The LLM-display tests take a real backend response and mark it as LLM-understood. Everything else runs against the real API and catalog.
 
 | Area | File |
 |---|---|
@@ -419,6 +573,7 @@ Only the loading, error and image-success tests intercept network calls; everyth
 | Ranking quality on the real catalog, eligibility of every result, unfamiliar and nonsense queries, price/category/limit filters, empty catalog, missing image, forced fallback, model-load failure → TF-IDF, FAISS failure → NumPy, scoring bounds | `tests/test_recommendations.py` |
 | Health, occasions and categories endpoints, response schema, 422 validation (incl. malformed JSON), unknown category, empty state, CORS allow/deny | `tests/test_api.py` |
 | Cross-occasion and add-on regressions, FAISS scores equal cosine similarities, empty catalog file | `tests/test_recommendations.py` |
+| LLM layer, covering: <ul><li>structured output and its validation</li><li>invalid responses, timeout, HTTP errors and 429</li><li>missing key, disabled mode, per-request override</li><li>budget grounding (rules win; no invented budget or minimum) and recipient extraction</li><li>product grounding (injected products ignored, every fact checked against the catalog, no catalog data sent)</li><li>caching, circuit breaker, routing</li><li>Gemini request format (key in header, not URL) and the API contract</li><li>ranking regression</li></ul> | `tests/test_llm.py` |
 
 Ranking tests check **properties** of the results (romantic words in the listing, inferred category, "Diwali" in the top titles) and never hard-coded product IDs. Semantic-mode tests are skipped, not failed, if the model cannot be downloaded.
 
@@ -468,9 +623,9 @@ No duplicate product IDs were returned. Two distinct listings are both named "Fl
 
 | Configuration | nDCG@10 | P@10 | wrong-occasion items | add-ons |
 |---|---|---|---|---|
-| Semantic only (1 / 0 / 0) | 0.649 | 0.85 | 3 | 1 |
+| Semantic only (1 / 0 / 0) | 0.643 | 0.84 | 3 | 1 |
 | Brief's weights 0.65 / 0.25 / 0.10 | 0.730 | 0.93 | 4 | 1 |
-| No concepts 0.70 / 0.30 / 0 | 0.659 | 0.85 | 3 | 1 |
+| No concepts 0.70 / 0.30 / 0 | 0.653 | 0.84 | 3 | 1 |
 | v1.0: 0.55 / 0.20 / 0.25, conflict 0.3, no add-on rule | 0.734 | 0.80 | 12 | 4 |
 | Shipped, but no occasion-conflict factor | 0.649 | 0.70 | 30 | 0 |
 | Shipped, but no add-on rule | 0.765 | 0.88 | 3 | 5 |
@@ -479,7 +634,8 @@ No duplicate product IDs were returned. Two distinct listings are both named "Fl
 
 (wrong-occasion and add-on counts are summed over the 11 top-10 lists.)
 
-- **Concepts genuinely help:** removing them drops nDCG@10 from 0.811 to about 0.66.
+- **Concepts genuinely help:** removing them drops nDCG@10 from 0.811 to about 0.65.
+- **Correction:** an earlier version of the judgments matched "pen" inside "O**pen** When Letters". After switching to whole-word matching, only the two baseline rows above changed slightly; the shipped configuration's score is unchanged.
 - **The current weights beat the brief's suggested weights:** 0.811 versus 0.730 with the same penalties.
 - **The conflict factor matters most:** without it, 30 wrong-occasion products enter the top 10s.
 - **Boilerplate down-weighting is a smaller, positive effect:** +0.025, and 2 fewer wrong-occasion items.
@@ -495,11 +651,14 @@ No duplicate product IDs were returned. Two distinct listings are both named "Fl
 - **Images.** All 110 supplied image URLs currently return `404 NoSuchBucket` (see the note at the top).
 - **Birthday and other generic occasions** rank generic gift products (gift cards, flowers), because the catalog has no occasion-specific items for them.
 - **Small model.** MiniLM-L6 is fast but shallow, and generic "celebrate / gift" language can still look similar to many occasions.
+- **LLM layer: latency and availability.** It adds about 1–2 s per uncached natural-language query, with frequent multi-second spikes (2–5 timeouts per 22-call evaluation run), and it depends on the provider: one Gemini model stopped responding during development. Routing, caching, the timeout and the circuit breaker limit the impact, but the LLM path is never as fast or predictable as the rules.
+- **LLM layer: evidence.** It clearly improves *query understanding*. Its effect on *recommendation relevance* is small, based on 15 natural-language queries with author-written labels, and not established in general. Outputs can vary slightly between runs even at temperature 0.
 
 ## Future improvements
 
 - Collect implicit feedback (clicks, add-to-cart) and learn the hybrid weights with learning-to-rank (e.g. LightGBM LambdaMART), evaluated with NDCG@10 on a labelled query set.
-- Re-rank the top 30 with a cross-encoder (`ms-marco-MiniLM-L-6-v2`), or optionally an LLM, for sharper relevance and natural-language explanations.
+- Re-rank the top 30 with a cross-encoder (`ms-marco-MiniLM-L-6-v2`) for sharper relevance.
+- Evaluate the LLM layer on a larger, independently labelled query set, and stream results so the rule-based list appears instantly while the LLM refines it.
 - Use real category names from the platform instead of inferred labels, and fetch the full image gallery.
 - Use `IndexHNSWFlat` and incremental indexing once the catalog grows into the hundreds of thousands, with a vector DB (Qdrant) for metadata filtering at scale.
 - Add personalisation (recipient age and gender, past purchases) and seasonality boosts (e.g. Diwali in October).

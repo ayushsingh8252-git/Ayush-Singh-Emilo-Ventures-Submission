@@ -56,6 +56,11 @@ def test_unknown_occasion_keeps_raw_query():
     ("under rs 2k", (None, 2000.0)),
     ("between 500 and 1500", (500.0, 1500.0)),
     ("above 3000 wedding", (3000.0, None)),
+    ("mom's bday, nothing above 1500 rupees", (None, 1500.0)),
+    ("not more than 2k", (None, 2000.0)),
+    ("no more than ₹800 please", (None, 800.0)),
+    ("at most 1200", (None, 1200.0)),
+    ("not exceeding 2500", (None, 2500.0)),
     ("Diwali", (None, None)),
 ])
 def test_budget_parsing(text, expected):

@@ -7,6 +7,12 @@ cannot be loaded), the fallback one forces TF-IDF.
 
 from __future__ import annotations
 
+import os
+
+# Tests must never call a real LLM API: force the optional LLM layer off before
+# app.config reads the environment (a real env var beats any .env file).
+os.environ["LLM_ENABLED"] = "false"
+
 import dataclasses
 import json
 

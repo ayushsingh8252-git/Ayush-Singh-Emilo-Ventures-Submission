@@ -134,7 +134,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <NavBar engineStatus={engineStatus} />
+      <NavBar engineStatus={engineStatus} llmStatus={health?.llm?.status} />
 
       <header className="relative overflow-hidden border-b border-sand-200/70 bg-gradient-to-b from-sand-50 to-ivory">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(194,100,60,0.07),transparent)]" />

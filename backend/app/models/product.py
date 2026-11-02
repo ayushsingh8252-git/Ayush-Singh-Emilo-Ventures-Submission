@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class Product(BaseModel):
@@ -37,21 +37,36 @@ class Product(BaseModel):
 
 
 class RecommendRequest(BaseModel):
-    occasion: str = Field(..., description="Occasion or free-text gifting intent, e.g. 'Diwali'.")
+    occasion: Optional[str] = Field(None, description="Occasion or free-text gifting intent, e.g. 'Diwali'.")
+    query: Optional[str] = Field(
+        None, description="Natural-language request, e.g. 'romantic gift for my girlfriend under ₹2,000'. "
+                          "Used instead of `occasion` when both are given.")
     limit: int = Field(10, ge=1, le=24)
     min_price: Optional[float] = Field(None, ge=0)
     max_price: Optional[float] = Field(None, ge=0)
     category: Optional[str] = Field(None, description="Category ID to restrict results to.")
+    use_llm: Optional[bool] = Field(
+        None, description="Override LLM query understanding for this request (default: server setting).")
 
-    @field_validator("occasion")
+    @field_validator("occasion", "query")
     @classmethod
-    def _strip_occasion(cls, value: str) -> str:
+    def _strip_text(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
         value = " ".join(value.split())
-        if not value:
-            raise ValueError("Occasion must not be empty.")
         if len(value) > 200:
             raise ValueError("Occasion must be at most 200 characters.")
-        return value
+        return value or None
+
+    @model_validator(mode="after")
+    def _needs_text(self) -> "RecommendRequest":
+        if not (self.query or self.occasion):
+            raise ValueError("Occasion must not be empty.")
+        return self
+
+    @property
+    def text(self) -> str:
+        return self.query or self.occasion or ""
 
     @field_validator("category")
     @classmethod
@@ -90,10 +105,19 @@ class OccasionInterpretation(BaseModel):
     concepts: list[str]
     applied_max_price: Optional[float] = None
     applied_min_price: Optional[float] = None
+    # Query understanding (rules or optional LLM). Never contains product data.
+    recipient: Optional[str] = None
+    preferences: list[str] = []
+    understanding_mode: str = "rules"  # "llm" or "rules"
+    llm_provider: Optional[str] = None
+    llm_model: Optional[str] = None
+    llm_fallback_reason: Optional[str] = None
+    understanding_latency_ms: float = 0.0
+    understanding_route: str = "rules"  # rules | llm | rules_exact_match
 
 
 class RecommendResponse(BaseModel):
-    occasion: str
+    occasion: str  # the text that was interpreted (query or occasion)
     interpretation: OccasionInterpretation
     total_results: int
     recommendation_mode: str

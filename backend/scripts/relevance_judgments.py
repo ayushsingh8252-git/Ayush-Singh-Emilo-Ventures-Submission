@@ -52,11 +52,11 @@ JUDGMENTS: dict[str, dict[str, str]] = {
         "ok": r"candle|body oil|gift card|gift sets|snacks|mug",
     },
     "Office Party": {
-        "core": r"pen|notebook|journal|self-care|wellness|fitness|gift card|office",
+        "core": r"\bpens?\b|notebook|journal|self-care|wellness|fitness|gift card|office",
         "ok": r"watch|chocolate|snacks|plant|mug|candle|herbal tea|shirt",
     },
     "Father's Day": {
-        "core": r"watch|pen|shirt|polo neck tshirts\(men\)",
+        "core": r"watch|\bpens?\b|shirt|polo neck tshirts\(men\)",
         "ok": r"perfume|wellness|fitness|self-care|star map|story book|mug|notebook|journal|herbal tea|"
               r"chocolate|gift card|cargo|jeans|pants",
     },
@@ -69,12 +69,37 @@ JUDGMENTS: dict[str, dict[str, str]] = {
         "ok": r"toy|xylophone|guitar|drum|gift card|story book",
     },
     "Graduation": {
-        "core": r"pen|watch|notebook|journal|gift card",
+        "core": r"\bpens?\b|watch|notebook|journal|gift card",
         "ok": r"star map|story book|perfume|bracelet|wellness|self-care|fitness|shirt|office|mug|chocolate|bag",
     },
     "Housewarming": {
         "core": r"housewarming|plant|planter|decor|décor|candle|bamboo|recycled|upcycled",
         "ok": r"gift sets|mug|herbal tea|gift card|flower|lil|tulip|marigold",
+    },
+}
+
+
+# Extra intents used only by the natural-language evaluation (scripts/compare_llm.py).
+EXTRA_JUDGMENTS: dict[str, dict[str, str]] = {
+    "Kids": {
+        "core": KIDS,
+        "ok": r"story book|gift card|chocolate|keychain",
+    },
+    "Retirement": {
+        "core": rf"watch|{WELLNESS}|\bpens?\b",
+        "ok": r"plant|decor|journal|notebook|gift card|perfume|star map|herbal tea|candle",
+    },
+    "Teacher": {
+        "core": r"\bpens?\b|notebook|journal|plant|planter",
+        "ok": rf"{FLOWERS}|chocolate|gift card|candle|mug|decor",
+    },
+    "Christmas": {
+        "core": r"christmas|candle|chocolate|gift sets",
+        "ok": r"gift card|snacks|teddy|plush|toy|decor|plant|herbal tea",
+    },
+    "Eco Wellness": {
+        "core": rf"bamboo|recycled|upcycled|organic|plant|{WELLNESS}|herbal tea",
+        "ok": r"candle|decor|journal|notebook|bath",
     },
 }
 
@@ -86,7 +111,7 @@ def grade(occasion: str, title: str) -> int:
             return 0
     if ADD_ONS.search(lowered):
         return 0
-    rules = JUDGMENTS[occasion]
+    rules = JUDGMENTS.get(occasion) or EXTRA_JUDGMENTS[occasion]
     if re.search(rules["core"], lowered):
         return 2
     if re.search(rules["ok"], lowered):

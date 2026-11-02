@@ -100,6 +100,43 @@ function ActiveFilters({ filters, categories, onFiltersChange }) {
   )
 }
 
+const FALLBACK_TEXT = {
+  timeout: 'the AI service timed out',
+  rate_limited: 'the AI service is rate-limiting requests',
+  circuit_open: 'the AI service is temporarily unavailable',
+  http_error: 'the AI service returned an error',
+  network: 'the AI service was unreachable',
+  invalid_response: 'the AI response was invalid',
+  missing_key: 'no API key is configured',
+}
+
+function Understanding({ interpretation: it }) {
+  const llm = it.understanding_mode === 'llm'
+  const fallback = !llm && FALLBACK_TEXT[it.llm_fallback_reason]
+  if (!llm && !fallback && !it.recipient) return null
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs" data-testid="understanding">
+      {llm && (
+        <span className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-2.5 py-0.5 font-medium text-white"
+          title={`Query interpreted by ${it.llm_provider} (${it.llm_model}); products and prices still come only from the catalog`}>
+          <Sparkles className="h-3 w-3" /> Understood by Gemini
+        </span>
+      )}
+      {it.recipient && (
+        <span className="rounded-full bg-white px-2.5 py-0.5 text-ink-700 ring-1 ring-sand-200">For: {it.recipient}</span>
+      )}
+      {it.preferences.map((p) => (
+        <span key={p} className="rounded-full bg-sand-50 px-2.5 py-0.5 text-ink-700 ring-1 ring-sand-200">{p}</span>
+      ))}
+      {fallback && (
+        <span className="text-ink-400" title={`LLM fallback reason: ${it.llm_fallback_reason}`}>
+          Rule-based understanding used because {fallback}.
+        </span>
+      )}
+    </div>
+  )
+}
+
 function Toolbar({ result, sort, onSortChange }) {
   const { interpretation: it, total_results: total, recommendation_mode: mode } = result
   const budget = [
@@ -127,6 +164,7 @@ function Toolbar({ result, sort, onSortChange }) {
           </div>
         )}
         {budget && <p className="mt-2 text-sm text-ink-500">Budget {budget}</p>}
+        <Understanding interpretation={it} />
       </div>
       <div className="flex shrink-0 items-center gap-3">
         <span

@@ -293,16 +293,25 @@ class OccasionIntent:
     match_type: str = "none"  # exact | phrase | fuzzy | semantic | none | generic
     min_price: Optional[float] = None
     max_price: Optional[float] = None
+    # Set only by the optional LLM layer: a label for occasions outside the
+    # profile library, and theme/preference text added to the query embedding.
+    display_override: Optional[str] = None
+    extra_expansion: str = ""
 
     @property
     def display_name(self) -> Optional[str]:
+        if self.display_override:
+            return self.display_override
         occasions = [p.name for p in self.matched_profiles if p.is_occasion]
         names = occasions or [p.name for p in self.matched_profiles]
         return " + ".join(names) if names else None
 
     @property
     def expansion_text(self) -> str:
-        return " ".join(p.description for p in self.matched_profiles)
+        parts = [p.description for p in self.matched_profiles]
+        if self.extra_expansion:
+            parts.append(self.extra_expansion)
+        return " ".join(parts)
 
     @property
     def concepts(self) -> list[Concept]:
@@ -314,7 +323,13 @@ class OccasionIntent:
 # --------------------------------------------------------------------------- #
 _NUM = r"(?:rs\.?|inr|₹)?\s*(\d[\d,]*(?:\.\d+)?)\s*(k)?\s*(?:rs|rupees|inr|/-)?"
 _BETWEEN = re.compile(rf"\bbetween\s+{_NUM}\s*(?:and|to|-)\s*{_NUM}", re.I)
-_MAX = re.compile(rf"(?:\b(?:under|below|less than|upto|up to|within|max|maximum|budget(?: of)?|cheaper than)\s+){_NUM}", re.I)
+# Negated lower bounds ("nothing above 1500", "no more than 2k") are upper bounds;
+# they are listed first so the _MIN pattern below never sees them.
+_MAX = re.compile(
+    rf"(?:\b(?:(?:nothing|not|no)\s+(?:above|over|more than|beyond|exceeding)|not exceeding|at most|"
+    rf"under|below|less than|upto|up to|within|max|maximum|budget(?: of)?|cheaper than)\s+){_NUM}",
+    re.I,
+)
 _MIN = re.compile(rf"(?:\b(?:above|over|more than|min|minimum|at least|starting)\s+){_NUM}", re.I)
 
 

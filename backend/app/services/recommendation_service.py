@@ -36,6 +36,8 @@ from app.models.product import (
 from app.services.data_loader import CatalogLoadResult, load_catalog
 from app.services.embedding_service import MODE_SEMANTIC, Encoder, create_encoder
 from app.services.occasion_service import CONCEPTS, OccasionIntent, OccasionService
+from app.services.llm.providers import create_provider
+from app.services.query_understanding import QueryUnderstandingService
 from app.services.preprocessing import (
     ProductDocument,
     build_documents,
@@ -88,7 +90,8 @@ class _Scored:
 class RecommendationEngine:
     def __init__(self, settings: Settings, catalog: CatalogLoadResult, docs: list[ProductDocument],
                  encoder: Encoder, vectors: np.ndarray, store: VectorStore, occasions: OccasionService,
-                 model_status: str, fallback_reason: Optional[str], vector_fallback_reason: Optional[str]) -> None:
+                 model_status: str, fallback_reason: Optional[str], vector_fallback_reason: Optional[str],
+                 understanding: Optional[QueryUnderstandingService] = None) -> None:
         self.settings = settings
         self.catalog = catalog
         self.docs = docs
@@ -99,6 +102,8 @@ class RecommendationEngine:
         self.model_status = model_status
         self.fallback_reason = fallback_reason
         self.vector_fallback_reason = vector_fallback_reason
+        # Optional LLM layer; without it the existing rule-based service is used.
+        self.understanding = understanding or QueryUnderstandingService(occasions)
         self.idf = compute_idf(d.body_tokens | d.shared_tokens for d in docs)
         self.concept_keywords = {k: c.keywords for k, c in CONCEPTS.items()}
         self.category_labels = infer_category_labels([d.product for d in docs])
@@ -126,8 +131,10 @@ class RecommendationEngine:
         vectors = cls._embed_documents(encoder, docs) if docs else np.zeros((0, 1), dtype=np.float32)
         store, vector_fallback_reason = create_vector_store(vectors)
         occasions = OccasionService(encode=encoder.encode if encoder.mode == MODE_SEMANTIC else None)
+        provider, llm_status, llm_reason = create_provider(settings)
+        understanding = QueryUnderstandingService(occasions, provider, llm_status, llm_reason)
         engine = cls(settings, catalog, docs, encoder, vectors, store, occasions,
-                     model_status, fallback_reason, vector_fallback_reason)
+                     model_status, fallback_reason, vector_fallback_reason, understanding)
         logger.info(
             "Recommendation engine ready in %.1fs: mode=%s, vector_store=%s, indexed=%d",
             time.perf_counter() - started, encoder.mode, store.backend, store.size,
@@ -181,6 +188,13 @@ class RecommendationEngine:
             "fallback_reason": self.fallback_reason,
             "vector_store": self.store.backend,
             "vector_store_fallback_reason": self.vector_fallback_reason,
+            "llm": {
+                "enabled": self.settings.llm_enabled,
+                "status": self.understanding.status,  # ready | disabled | missing_key | unsupported_provider
+                "provider": self.understanding.provider.name if self.understanding.provider else None,
+                "model": self.understanding.provider.model if self.understanding.provider else None,
+                "detail": self.understanding.status_reason,
+            },
         }
 
     def categories(self) -> list[dict]:
@@ -197,7 +211,8 @@ class RecommendationEngine:
         )
 
     def recommend(self, request: RecommendRequest) -> RecommendResponse:
-        intent = self.occasions.understand(request.occasion)
+        understood = self.understanding.understand(request.text, request.use_llm)
+        intent = understood.intent
         min_price = request.min_price if request.min_price is not None else intent.min_price
         max_price = request.max_price if request.max_price is not None else intent.max_price
         interpretation = OccasionInterpretation(
@@ -206,11 +221,19 @@ class RecommendationEngine:
             concepts=[c.phrase for c in intent.concepts],
             applied_min_price=min_price,
             applied_max_price=max_price,
+            recipient=understood.recipient,
+            preferences=understood.preferences,
+            understanding_mode=understood.mode,
+            llm_provider=understood.provider,
+            llm_model=understood.model,
+            llm_fallback_reason=understood.fallback_reason,
+            understanding_latency_ms=round(understood.latency_ms, 1),
+            understanding_route=understood.route,
         )
 
         def response(items: list[Recommendation], message: Optional[str] = None) -> RecommendResponse:
             return RecommendResponse(
-                occasion=request.occasion, interpretation=interpretation, total_results=len(items),
+                occasion=request.text, interpretation=interpretation, total_results=len(items),
                 recommendation_mode=self.mode, recommendations=items, message=message,
             )
 
@@ -252,7 +275,7 @@ class RecommendationEngine:
             return self.encoder.encode([GENERIC_GIFT_QUERY])[0]
         words = intent.search_text.split()
         raw_text = " ".join(w for w in words if w.lower() not in FILLER_WORDS) or intent.search_text
-        if not intent.matched_profiles:
+        if not intent.expansion_text:
             return self.encoder.encode([raw_text])[0]
         raw, expansion = self.encoder.encode([raw_text, intent.expansion_text])
         blended = QUERY_WEIGHT_WITH_PROFILE * raw + (1 - QUERY_WEIGHT_WITH_PROFILE) * expansion

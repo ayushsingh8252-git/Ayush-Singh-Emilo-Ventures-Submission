@@ -256,3 +256,39 @@ test('active filter chips can be removed', async ({ page }) => {
   await cleared
   await expect(page.getByText('Max ₹800')).toHaveCount(0)
 })
+
+// The LLM layer is disabled for the test servers; these tests take a REAL response from the
+// backend and mark it as LLM-understood, to check how the UI presents it.
+async function markAsLlm(page, overrides) {
+  await page.route('**/api/recommend', async (route) => {
+    const response = await route.fetch()
+    const json = await response.json()
+    json.interpretation = { ...json.interpretation, ...overrides }
+    await route.fulfill({ response, json })
+  })
+}
+
+test('LLM-understood queries show recipient, preferences and the Gemini badge', async ({ page }) => {
+  await markAsLlm(page, {
+    understanding_mode: 'llm', llm_provider: 'gemini', llm_model: 'gemini-3.5-flash-lite',
+    recipient: 'girlfriend', preferences: ['romantic', 'thoughtful'],
+  })
+  const request = page.waitForRequest((r) => r.url().endsWith('/api/recommend'))
+  await occasionInput(page).fill('Suggest a romantic gift for my girlfriend under ₹2,000')
+  await findButton(page).click()
+  expect((await request).postDataJSON().query).toBe('Suggest a romantic gift for my girlfriend under ₹2,000')
+  const understanding = page.getByTestId('understanding')
+  await expect(understanding.getByText('Understood by Gemini')).toBeVisible()
+  await expect(understanding.getByText('For: girlfriend')).toBeVisible()
+  await expect(understanding.getByText('thoughtful')).toBeVisible()
+  await expect(page.getByText('Budget up to ₹2,000')).toBeVisible()
+  expect((await prices(page)).every((p) => p <= 2000)).toBe(true)
+})
+
+test('LLM fallback is explained to the user', async ({ page }) => {
+  await markAsLlm(page, { understanding_mode: 'rules', llm_fallback_reason: 'timeout' })
+  await occasionInput(page).fill('Anniversary')
+  await findButton(page).click()
+  await expect(page.getByText('Rule-based understanding used because the AI service timed out.')).toBeVisible()
+  await expect(cards(page).first()).toBeVisible()
+})

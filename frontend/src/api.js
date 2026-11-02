@@ -26,7 +26,7 @@ export function getRecommendations({ occasion, limit = 12, minPrice, maxPrice, c
   return request('/api/recommend', {
     method: 'POST',
     body: JSON.stringify({
-      occasion,
+      query: occasion, // natural-language text; the backend interprets it (rules or optional LLM)
       limit,
       min_price: toNumber(minPrice),
       max_price: toNumber(maxPrice),
