@@ -666,7 +666,7 @@ No duplicate product IDs were returned. Two distinct listings are both named "Fl
 
 ## Use of AI coding assistants
 
-This project was built with the help of **Claude Code (Anthropic)**, which was used to write and refactor code, tests and this README under my direction. All design decisions were reviewed, and the results above were produced by running the code on the supplied catalog.
+AI coding assistants were used to help write and refactor code, tests and documentation, as the assignment permits. All design decisions were reviewed, and every result reported above was produced by running the code on the supplied catalog.
 
 ## Data and licence
 
