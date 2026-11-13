@@ -137,7 +137,7 @@ export default function App() {
       <NavBar engineStatus={engineStatus} llmStatus={health?.llm?.status} />
 
       <header className="relative overflow-hidden border-b border-sand-200/70 bg-gradient-to-b from-sand-50 to-ivory">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(194,100,60,0.07),transparent)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(0,0,0,0.05),transparent)]" />
         <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-14 text-center sm:px-6 sm:pt-20">
           <p className="inline-flex items-center gap-2 rounded-full border border-sand-200 bg-white/70 px-3 py-1 text-xs font-medium text-ink-500">
             <span className="h-1.5 w-1.5 rounded-full bg-clay-500" />

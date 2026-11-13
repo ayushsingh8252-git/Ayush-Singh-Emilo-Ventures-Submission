@@ -54,5 +54,5 @@ def recommend(payload: RecommendRequest, engine: RecommendationEngine = Depends(
     try:
         return engine.recommend(payload)
     except Exception as exc:  # noqa: BLE001
-        logger.exception("Recommendation failed for %r", payload.occasion)
+        logger.exception("Recommendation failed for %r", payload.text)
         raise HTTPException(status_code=500, detail="Could not compute recommendations.") from exc

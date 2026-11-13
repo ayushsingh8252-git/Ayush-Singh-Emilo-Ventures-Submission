@@ -165,12 +165,24 @@ test('budget written in the query is applied', async ({ page }) => {
   expect((await prices(page)).every((p) => p <= 1000)).toBe(true)
 })
 
-test('product images use the catalog URL and fall back when it fails', async ({ page }) => {
+test('product images fall back to the representative photo when the catalog URL fails', async ({ page }) => {
   await occasionInput(page).fill('Diwali')
   await findButton(page).click()
   const first = cards(page).first()
-  await expect(first.getByTestId('image-fallback')).toBeVisible() // catalog host currently returns 404
-  await expect(first.getByTestId('image-fallback')).toContainText('Image unavailable')
+  // The catalog host currently returns 404, so the downloaded Commons photo is shown instead.
+  await expect(first.locator('img')).toHaveAttribute('src', /^\/product-images\/[\w-]+\.jpg$/)
+  await expect(first.locator('img')).toBeVisible()
+  await expect(first.getByText('Representative photo')).toBeVisible()
+  await expect(first.getByTestId('image-fallback')).toHaveCount(0)
+})
+
+test('generated artwork shows when no photo can be loaded', async ({ page }) => {
+  await page.route(/\/product-images\//, (route) => route.fulfill({ status: 404 }))
+  await occasionInput(page).fill('Diwali')
+  await findButton(page).click()
+  const first = cards(page).first()
+  await expect(first.getByTestId('image-fallback')).toBeVisible()
+  await expect(first.getByTestId('image-fallback')).toContainText(await first.locator('h3').innerText())
 })
 
 test('product images render when the image host responds', async ({ page }) => {
@@ -240,6 +252,7 @@ test('product detail panel shows full explanation and score breakdown', async ({
   await expect(dialog.getByText('Keyword match')).toBeVisible()
   await expect(dialog.getByText('Occasion fit')).toBeVisible()
   await expect(dialog.getByText(/Recommended for Anniversary/)).toBeVisible()
+  await expect(dialog.getByTestId('photo-credit')).toContainText('Wikimedia Commons')
   await page.keyboard.press('Escape')
   await expect(dialog).toHaveCount(0)
 })

@@ -62,6 +62,21 @@ def test_unknown_occasion_keeps_raw_query():
     ("at most 1200", (None, 1200.0)),
     ("not exceeding 2500", (None, 2500.0)),
     ("Diwali", (None, None)),
+    # phrasings that used to be ignored
+    ("my budget is 1500", (None, 1500.0)),
+    ("budget: 2000", (None, 2000.0)),
+    ("birthday gift 500 to 1000", (500.0, 1000.0)),
+    ("from ₹500 - ₹1000", (500.0, 1000.0)),
+    ("1-2k", (1000.0, 2000.0)),
+    ("between 500 and 2k", (500.0, 2000.0)),
+    ("₹2000 gift for mom", (None, 2000.0)),
+    ("gift around 2000 rupees", (None, None)),  # approximate, not a hard cap
+    # ages and counts are not prices
+    ("toys for kids under 5", (None, None)),
+    ("gift for a 5 to 7 year old", (None, None)),
+    ("over 18 birthday gift", (None, None)),
+    ("under 5 kids", (None, None)),
+    ("teddy under 500 for my 2 yr old", (None, 500.0)),
 ])
 def test_budget_parsing(text, expected):
     _, min_price, max_price = parse_budget(text)
@@ -73,6 +88,18 @@ def test_budget_phrase_is_removed_from_search_text():
     assert intent.max_price == 2000.0
     assert intent.display_name == "Diwali"
     assert "2" not in intent.search_text
+
+
+@pytest.mark.parametrize("query, expected", [
+    ("gift for a 5 to 7 year old", True),
+    ("present for my 8yo", True),
+    ("birthday gift for a 6 year old", True),
+    ("10 year anniversary", False),
+    ("gift for my 40 year old brother", False),
+])
+def test_child_age_is_a_kids_cue(query, expected):
+    names = [p.name for p in service.understand(query).matched_profiles]
+    assert ("Kids" in names) is expected
 
 
 def test_budget_only_query_is_generic():

@@ -18,7 +18,7 @@ More screenshots: [Diwali](screenshots/03-results-diwali.png) · [free text + bu
 > - The same `NoSuchBucket` error is returned for the direct path-style URL `https://s3.amazonaws.com/s3aws.emilo.in/products/…`.
 > - All 110 URLs are well-formed (`https://s3aws.emilo.in/products/<13-digit timestamp>-<UUID>.<png|jpg|jpeg|webp>`) and the host resolves (Cloudflare).
 >
-> So the storage bucket behind the CDN no longer exists; the URLs are not malformed. The UI shows a category-matched placeholder when an image fails. A Playwright test serves a real PNG for that host and confirms the `<img>` renders with the original URL, so the images will appear with no code change once the bucket is restored.
+> So the storage bucket behind the CDN no longer exists; the URLs are not malformed. Instead, each of the 104 products shows a **representative photo** of its product type from Wikimedia Commons (freely licensed, hand-checked, stored in `frontend/public/product-images/`). They are labelled "Representative photo", and the detail panel credits the author and licence. They are fetched by `python -m scripts.fetch_product_images` (in `backend/`); the manifest is `frontend/src/productImages.json`. The UI tries the catalog URL first, then the representative photo, then generated black-and-white artwork (icon, name and brand). A Playwright test serves a real PNG for that host and confirms the `<img>` renders with the original URL, so the images will appear with no code change once the bucket is restored.
 
 ---
 
@@ -53,7 +53,7 @@ Given a product catalog (supplied as `products.json` with the assignment), recom
 
 - **Hybrid ranking:** semantic similarity (MiniLM + FAISS), keyword relevance and occasion-concept relevance, each normalised to [0, 1].
 - **Occasion understanding:** 21 occasion profiles plus recipient cues ("girlfriend", "child", "colleague"). Matching handles exact aliases, phrases inside free text, typos (*"aniversary"*, *"weding"*) and **semantic matching** for unfamiliar occasions (*"Eid celebration"*, *"retirement"*).
-- **Budget parsing from text:** *"under ₹1,000"*, *"below 500"*, *"between 500 and 1500"*, *"under 2k"*.
+- **Budget parsing from text:** *"under ₹1,000"*, *"below 500"*, *"between 500 and 1500"*, *"500 to 1000"*, *"1-2k"*, *"my budget is 1500"*, *"₹2000 gift"*, *"under 2k"*. Ages and counts (*"kids under 5"*, *"5 to 7 year old"*) are not read as prices, and a child's age is a Kids cue.
 - **Grounded explanations:** each reason names the matched occasion themes, quotes words that actually appear in the listing, and cites the description sentence most similar to the query.
 - **Diversity-aware ranking:** MMR re-ranking with category and product-group penalties.
 - **Honest empty states:** a relevance gate keeps unrelated products out of the results, so *"gaming laptop"* returns no matches.
@@ -62,7 +62,7 @@ Given a product catalog (supplied as `products.json` with the assignment), recom
 - **Graceful degradation:** TF-IDF fallback if the model can't load, and a NumPy index if FAISS can't load. Both are reported by `/api/health`.
 - **Shareable searches:** the query is synced to `?q=` in the URL.
 - **Optional LLM query understanding (Gemini):** structured extraction of occasion, recipient, budget, themes and preferences from free text. It is validated, grounded and cached, with a circuit breaker and automatic fallback to the rules. It is off by default.
-- **Tests:** 146 backend tests (pytest, including 49 for the LLM layer with no network calls) and 22 browser end-to-end tests (Playwright in Chrome), plus two offline evaluations (`scripts/ablation.py`, `scripts/compare_llm.py`).
+- **Tests:** 164 backend tests (pytest, including 49 for the LLM layer with no network calls) and 23 browser end-to-end tests (Playwright in Chrome), plus two offline evaluations (`scripts/ablation.py`, `scripts/compare_llm.py`).
 
 ## Architecture
 
@@ -107,6 +107,7 @@ backend/
     utils/scoring.py            pure scoring functions
   data/products.json            the supplied catalog (unmodified)
   scripts/evaluate_queries.py   prints ranked results for manual evaluation
+  scripts/fetch_product_images.py  downloads a representative Commons photo per product
   tests/                        pytest suite
   scripts/relevance_judgments.py  hand-written graded judgments for offline evaluation
   scripts/ablation.py         compares ranking configurations (nDCG@10, P@10)
@@ -186,7 +187,7 @@ Lexical signals (keyword and concept) only use **words that appear in the listin
 
 The input passes through these steps:
 
-1. **Budget extraction:** a price phrase is removed from the text and applied as a filter. Explicit request filters take precedence.
+1. **Budget extraction:** a price phrase is removed from the text and applied as a filter. Explicit request filters take precedence. Bare numbers under 50 without a currency marker or "k", and numbers followed by "year old" or "months old", are treated as ages or counts, not prices.
 2. **Exact alias match:** *"xmas"* → Christmas, *"griha pravesh"* → Housewarming.
 3. **Phrase match inside free text:** longest alias first, on word boundaries. *"birthday gift for my son"* → Birthday + Kids.
 4. **Fuzzy match** with `difflib`: *"aniversry"* → Anniversary.
@@ -535,7 +536,7 @@ cd backend
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Result: **146 passed** (about 30–80 s; the first run also downloads the model).
+Result: **164 passed** (about 30–80 s; the first run also downloads the model).
 
 The suite **never calls a real LLM**: `conftest.py` forces `LLM_ENABLED=false`, LLM tests use a fake provider, and the Gemini client is tested with `httpx.MockTransport`.
 
@@ -548,7 +549,7 @@ cd frontend
 npm run test:e2e
 ```
 
-Result: **22 passed** in Chrome. Covered:
+Result: **23 passed** in Chrome. Covered:
 
 - the labelled input, search button, Enter key and suggestion chips
 - results rendering below the input, with rank, category, price, stock, match score and reason
@@ -648,7 +649,7 @@ No duplicate product IDs were returned. Two distinct listings are both named "Fl
 - **No independent ground truth.** There are no click or purchase labels. Configurations were compared with author-written judgments (see the ranking audit), which are not independent of the concept library. Scores are relevance scores, not accuracy.
 - **Hand-curated knowledge.** The occasion and concept library is written by hand. It is easy to extend, but it reflects one person's judgement and an India-centric gifting context.
 - **Inferred categories** come from a keyword taxonomy and can be wrong for ambiguous listings. They are always labelled as inferred.
-- **Images.** All 110 supplied image URLs currently return `404 NoSuchBucket` (see the note at the top).
+- **Images.** All 110 supplied image URLs currently return `404 NoSuchBucket` (see the note at the top). The photos shown are representative Commons photos of each product type, not the vendors' own product shots.
 - **Birthday and other generic occasions** rank generic gift products (gift cards, flowers), because the catalog has no occasion-specific items for them.
 - **Small model.** MiniLM-L6 is fast but shallow, and generic "celebrate / gift" language can still look similar to many occasions.
 - **LLM layer: latency and availability.** It adds about 1–2 s per uncached natural-language query, with frequent multi-second spikes (2–5 timeouts per 22-call evaluation run), and it depends on the provider: one Gemini model stopped responding during development. Routing, caching, the timeout and the circuit breaker limit the impact, but the LLM path is never as fast or predictable as the rules.

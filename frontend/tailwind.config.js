@@ -7,16 +7,18 @@ export default {
         display: ['Fraunces', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      // Black-and-white theme: every token is a neutral grey. The accent ("clay")
+      // and positive ("sage") roles are carried by black and by weight, not hue.
       colors: {
-        ivory: '#FBF8F3',
-        sand: { 50: '#F6F1E9', 100: '#EFE7DA', 200: '#E3D6C2', 300: '#CDB99B' },
-        ink: { 900: '#1F1B16', 700: '#3D362E', 500: '#6B6157', 400: '#8C8177' },
-        clay: { 50: '#FBEFE9', 100: '#F6DCCF', 500: '#C2643C', 600: '#A8522E', 700: '#8A4225' },
-        sage: { 50: '#EEF3EC', 600: '#4F6F4A' },
+        ivory: '#FFFFFF',
+        sand: { 50: '#F5F5F5', 100: '#EBEBEB', 200: '#DEDEDE', 300: '#C2C2C2' },
+        ink: { 900: '#0A0A0A', 700: '#2E2E2E', 500: '#595959', 400: '#737373' },
+        clay: { 50: '#F2F2F2', 100: '#E3E3E3', 500: '#1A1A1A', 600: '#000000', 700: '#000000' },
+        sage: { 50: '#EDEDED', 600: '#1A1A1A' },
       },
       boxShadow: {
-        soft: '0 1px 2px rgba(31,27,22,0.04), 0 8px 24px -12px rgba(31,27,22,0.12)',
-        lift: '0 2px 4px rgba(31,27,22,0.05), 0 22px 40px -18px rgba(31,27,22,0.28)',
+        soft: '0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -12px rgba(0,0,0,0.12)',
+        lift: '0 2px 4px rgba(0,0,0,0.05), 0 22px 40px -18px rgba(0,0,0,0.28)',
       },
       keyframes: {
         rise: { '0%': { opacity: 0, transform: 'translateY(8px)' }, '100%': { opacity: 1, transform: 'none' } },

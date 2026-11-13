@@ -14,7 +14,7 @@ export default function ProductCard({ product, rank, index, onOpen }) {
         className="relative block aspect-[4/3] overflow-hidden bg-sand-50 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-clay-500"
         aria-label={`View details for ${product.name}`}
       >
-        <ProductImage src={product.image_url} alt={product.name} category={product.category_label} />
+        <ProductImage src={product.image_url} alt={product.name} category={product.category_label} brand={product.brand} seed={product.product_id} />
         <span className="absolute left-3 top-3 rounded-md bg-ink-900 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">
           #{rank}
         </span>

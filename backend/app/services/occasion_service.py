@@ -321,16 +321,32 @@ class OccasionIntent:
 # --------------------------------------------------------------------------- #
 # Budget parsing
 # --------------------------------------------------------------------------- #
-_NUM = r"(?:rs\.?|inr|₹)?\s*(\d[\d,]*(?:\.\d+)?)\s*(k)?\s*(?:rs|rupees|inr|/-)?"
+# "(?![a-z])" keeps the k suffix from eating the start of a word ("under 5 kids").
+_NUM = r"(?:rs\.?|inr|₹)?\s*(\d[\d,]*(?:\.\d+)?)\s*(k(?![a-z]))?\s*(?:rs\b|rupees|inr|/-)?"
 _BETWEEN = re.compile(rf"\bbetween\s+{_NUM}\s*(?:and|to|-)\s*{_NUM}", re.I)
+# "500 to 1000", "from ₹500 - ₹1000", "1k-2k"
+_RANGE = re.compile(rf"(?:\bfrom\s+)?(?<![\w.]){_NUM}\s*(?:to|-|–)\s*{_NUM}", re.I)
 # Negated lower bounds ("nothing above 1500", "no more than 2k") are upper bounds;
 # they are listed first so the _MIN pattern below never sees them.
 _MAX = re.compile(
     rf"(?:\b(?:(?:nothing|not|no)\s+(?:above|over|more than|beyond|exceeding)|not exceeding|at most|"
-    rf"under|below|less than|upto|up to|within|max|maximum|budget(?: of)?|cheaper than)\s+){_NUM}",
+    rf"under|below|less than|upto|up to|within|max|maximum|cheaper than)\s+"
+    rf"|\bbudget\b(?:\s+(?:of|is))?\s*[:=]?\s*){_NUM}",
     re.I,
 )
 _MIN = re.compile(rf"(?:\b(?:above|over|more than|min|minimum|at least|starting)\s+){_NUM}", re.I)
+# A lone amount with a currency marker ("₹2000 gift", "2000 rupees") is a budget cap.
+_AMOUNT = re.compile(
+    r"(?:rs\.?|inr|₹)\s*(\d[\d,]*(?:\.\d+)?)\s*(k(?![a-z]))?|(?<![\w.])(\d[\d,]*(?:\.\d+)?)\s*(k)?\s*(?:rs\b|rupees|inr|/-)",
+    re.I,
+)
+_CURRENCY = re.compile(r"rs\b|inr|₹|rupee|/-", re.I)
+# "5 year old", "6 yrs", "18 months": ages, never prices.
+_AGE_AFTER = re.compile(r"\s*-?\s*(?:years?|yrs?|y/?o|months?|old)\b", re.I)
+_APPROX_BEFORE = re.compile(r"\b(?:around|about|approx\w*|roughly)\s*$|~\s*$", re.I)
+# Bare numbers below this, without a currency marker or "k", are ages or counts
+# ("toys for kids under 5", "over 18"); the cheapest catalog item costs more.
+MIN_UNMARKED_AMOUNT = 50
 
 
 def _to_amount(number: str, k_suffix: Optional[str]) -> float:
@@ -338,22 +354,51 @@ def _to_amount(number: str, k_suffix: Optional[str]) -> float:
     return value * 1000 if k_suffix else value
 
 
+def _amounts(match: re.Match) -> list[float]:
+    groups = match.groups()
+    return [_to_amount(groups[i], groups[i + 1]) for i in range(0, len(groups), 2) if groups[i]]
+
+
+def _find_price(pattern: re.Pattern, text: str) -> Optional[re.Match]:
+    """First match of ``pattern`` that reads as a price rather than an age or count."""
+    for match in pattern.finditer(text):
+        if _AGE_AFTER.match(text, match.end()):
+            continue
+        marked = bool(_CURRENCY.search(match.group(0))) or any(
+            match.group(i) for i in range(2, len(match.groups()) + 1, 2))
+        if marked or min(_amounts(match)) >= MIN_UNMARKED_AMOUNT:
+            return match
+    return None
+
+
 def parse_budget(text: str) -> tuple[str, Optional[float], Optional[float]]:
     """Extract (text_without_budget, min_price, max_price)."""
     min_price = max_price = None
-    match = _BETWEEN.search(text)
+
+    def cut(match: re.Match) -> str:
+        return text[: match.start()] + " " + text[match.end():]
+
+    match = _find_price(_BETWEEN, text) or _find_price(_RANGE, text)
     if match:
-        min_price = _to_amount(match.group(1), match.group(2))
-        max_price = _to_amount(match.group(3), match.group(4))
-        text = text[: match.start()] + " " + text[match.end():]
-    match = _MAX.search(text)
+        low, low_k, high, high_k = match.groups()
+        # "1-2k" shares one suffix (₹1,000-2,000); "500 to 2k" does not.
+        shared_k = high_k if not low_k and _to_amount(low, None) < _to_amount(high, None) else low_k
+        min_price, max_price = _to_amount(low, shared_k), _to_amount(high, high_k)
+        text = cut(match)
+    match = _find_price(_MAX, text)
     if match:
-        max_price = _to_amount(match.group(1), match.group(2))
-        text = text[: match.start()] + " " + text[match.end():]
-    match = _MIN.search(text)
+        max_price = _amounts(match)[0]
+        text = cut(match)
+    match = _find_price(_MIN, text)
     if match:
-        min_price = _to_amount(match.group(1), match.group(2))
-        text = text[: match.start()] + " " + text[match.end():]
+        min_price = _amounts(match)[0]
+        text = cut(match)
+    if min_price is None and max_price is None:
+        match = _find_price(_AMOUNT, text)
+        # "around ₹1000" is not a hard cap; leave it in the text for the other signals.
+        if match and not _APPROX_BEFORE.search(text[: match.start()]):
+            max_price = _amounts(match)[0]
+            text = cut(match)
     if min_price is not None and max_price is not None and min_price > max_price:
         min_price, max_price = max_price, min_price
     return " ".join(text.split()), min_price, max_price
@@ -362,6 +407,17 @@ def parse_budget(text: str) -> tuple[str, Optional[float], Optional[float]]:
 # --------------------------------------------------------------------------- #
 # Occasion matching
 # --------------------------------------------------------------------------- #
+# "5 year old", "5-7 yrs old", "8yo", "18 months old"; "10 year anniversary" is not an age.
+_AGE = re.compile(
+    r"\b(\d{1,2})\s*(?:(?:-|to)\s*\d{1,2}\s*)?-?\s*(?:(years?|yrs?|months?)\s*-?\s*old\b|(y/?o)\b)", re.I)
+MAX_CHILD_AGE = 12
+
+
+def _is_child_age(text: str) -> bool:
+    return any((m.group(2) or "").lower().startswith("month") or int(m.group(1)) <= MAX_CHILD_AGE
+               for m in _AGE.finditer(text))
+
+
 def normalize_phrase(text: str) -> str:
     text = fold(text).replace("'", "").replace("’", "")
     return " ".join(re.findall(r"[a-z0-9]+", text))
@@ -454,6 +510,11 @@ class OccasionService:
             match_type = "semantic"
         else:
             profiles, match_type = [], "none"
+        # A child's age ("5 year old", "18 months") is a Kids cue even without a kid word.
+        kids = self._alias_index.get("kids")
+        if kids and kids not in profiles and _is_child_age(search_text):
+            profiles = [*profiles, kids]
+            match_type = "phrase" if match_type in {"none", "semantic"} else match_type
 
         scale = self.SEMANTIC_WEIGHT_SCALE if match_type == "semantic" else 1.0
         weights: dict[str, float] = {}

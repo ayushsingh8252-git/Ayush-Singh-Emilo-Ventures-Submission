@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Sparkles, X } from 'lucide-react'
-import { MatchBadge, Price, ProductImage, Stock } from './productUi.jsx'
+import { MatchBadge, Price, ProductImage, Stock, webPhoto } from './productUi.jsx'
 
 const SIGNALS = [
   ['semantic', 'Semantic similarity', 'How close the listing text is in meaning to the occasion (MiniLM embeddings).'],
@@ -25,6 +25,7 @@ function ScoreBar({ label, hint, value }) {
 
 export default function ProductDetail({ product, rank, occasion, onClose }) {
   const closeRef = useRef(null)
+  const photo = webPhoto(product.product_id)
 
   useEffect(() => {
     const onKey = (event) => event.key === 'Escape' && onClose()
@@ -59,7 +60,7 @@ export default function ProductDetail({ product, rank, occasion, onClose }) {
 
         <div className="grid sm:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <div className="relative aspect-[4/3] bg-sand-50 sm:aspect-auto sm:min-h-full">
-            <ProductImage src={product.image_url} alt={product.name} category={product.category_label} size="lg" />
+            <ProductImage src={product.image_url} alt={product.name} category={product.category_label} brand={product.brand} seed={product.product_id} size="lg" />
             <span className="absolute left-4 top-4 rounded-md bg-ink-900 px-2 py-0.5 text-xs font-semibold text-white">
               #{rank} for {occasion}
             </span>
@@ -111,6 +112,19 @@ export default function ProductDetail({ product, rank, occasion, onClose }) {
             <p className="mt-4 text-[11px] text-ink-400">
               Product ID {product.product_id} · Category ID {product.category_id}
             </p>
+            {photo && (
+              <p className="mt-1 text-[11px] text-ink-400" data-testid="photo-credit">
+                Representative photo (the vendor's image is unavailable):{' '}
+                <a href={photo.source} target="_blank" rel="noreferrer" className="underline hover:text-ink-900">
+                  {photo.author}
+                </a>
+                {' · '}
+                {photo.license_url
+                  ? <a href={photo.license_url} target="_blank" rel="noreferrer" className="underline hover:text-ink-900">{photo.license}</a>
+                  : photo.license}
+                {' · Wikimedia Commons'}
+              </p>
+            )}
           </div>
         </div>
       </div>

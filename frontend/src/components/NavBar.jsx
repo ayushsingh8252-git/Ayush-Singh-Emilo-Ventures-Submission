@@ -2,9 +2,10 @@ import { BookOpen, Gift, Sparkles } from 'lucide-react'
 import { API_URL } from '../api.js'
 
 const STATUS = {
-  semantic: { dot: 'bg-emerald-500', label: 'AI ranking active', hint: 'MiniLM embeddings + FAISS hybrid ranking' },
-  tfidf_fallback: { dot: 'bg-amber-500', label: 'Keyword fallback', hint: 'Embedding model unavailable: TF-IDF ranking' },
-  offline: { dot: 'bg-rose-500', label: 'Service offline', hint: 'The recommendation API is not reachable' },
+  // Monochrome status: solid = healthy, half = degraded, hollow = offline.
+  semantic: { dot: 'bg-ink-900', label: 'AI ranking active', hint: 'MiniLM embeddings + FAISS hybrid ranking' },
+  tfidf_fallback: { dot: 'bg-[linear-gradient(90deg,#0A0A0A_50%,#FFFFFF_50%)] ring-1 ring-ink-900', label: 'Keyword fallback', hint: 'Embedding model unavailable: TF-IDF ranking' },
+  offline: { dot: 'bg-white ring-1 ring-ink-900', label: 'Service offline', hint: 'The recommendation API is not reachable' },
   checking: { dot: 'bg-ink-400 animate-pulse', label: 'Connecting…', hint: 'Checking the recommendation API' },
 }
 
